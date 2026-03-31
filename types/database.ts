@@ -31,6 +31,9 @@ export interface ProfileRow {
   updated_at: string
 }
 
+/** `daily` = seed every day; `once` = only on occurrence_date */
+export type TaskRecurrence = 'daily' | 'once'
+
 export interface TaskTemplateRow {
   id: string
   user_id: string
@@ -43,6 +46,20 @@ export interface TaskTemplateRow {
   is_active: boolean
   target_value: number | null
   unit: string | null
+  recurrence: TaskRecurrence
+  occurrence_date: string | null // ISO date when recurrence === 'once'
+  created_at: string
+  updated_at: string
+}
+
+export interface DailyWellnessRow {
+  id: string
+  user_id: string
+  date: string
+  weight: number | null
+  diet_note: string | null
+  exercise_done: boolean
+  exercise_note: string | null
   created_at: string
   updated_at: string
 }
@@ -82,6 +99,11 @@ export type TaskTemplateInsert = Omit<
   'id' | 'created_at' | 'updated_at'
 >
 
+export type DailyWellnessInsert = Omit<
+  DailyWellnessRow,
+  'id' | 'created_at' | 'updated_at'
+>
+
 export type DailyLogInsert = Omit<
   DailyLogRow,
   'id' | 'created_at' | 'updated_at'
@@ -102,6 +124,10 @@ export type ProfileUpdate = Partial<
 
 export type TaskTemplateUpdate = Partial<
   Omit<TaskTemplateRow, 'id' | 'user_id' | 'created_at' | 'updated_at'>
+>
+
+export type DailyWellnessUpdate = Partial<
+  Omit<DailyWellnessRow, 'id' | 'user_id' | 'date' | 'created_at' | 'updated_at'>
 >
 
 export type DailyLogUpdate = Partial<
@@ -182,6 +208,12 @@ export interface Database {
         Update: Partial<NotificationSettingsUpsert>
         Relationships: []
       }
+      daily_wellness: {
+        Row: DailyWellnessRow
+        Insert: DailyWellnessInsert
+        Update: DailyWellnessUpdate
+        Relationships: []
+      }
     }
     // Must be `{}` so `keyof Views` is `never` — otherwise `Record<string, never>`
     // makes every string a valid view name and breaks `.from('daily_logs').upsert()`.
@@ -216,6 +248,7 @@ export type Profile        = TableRow<'profiles'>
 export type TaskTemplate   = TableRow<'task_templates'>
 export type DailyLog       = TableRow<'daily_logs'>
 export type DailyReview    = TableRow<'daily_reviews'>
+export type DailyWellness  = TableRow<'daily_wellness'>
 
 // ---------------------------------------------------------------------------
 // Join types (Supabase nested select results)

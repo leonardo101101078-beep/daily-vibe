@@ -19,18 +19,39 @@ export async function seedTodayLogs(
 ): Promise<void> {
   const supabase = createClient()
 
+  // Auto-deactivate one-off templates whose date has passed
+  await supabase
+    .from('task_templates')
+    .update({ is_active: false })
+    .eq('user_id', userId)
+    .eq('recurrence', 'once')
+    .lt('occurrence_date', today)
+
   const { data: templates, error: tErr } = await supabase
     .from('task_templates')
-    .select('id')
+    .select('id, recurrence, occurrence_date')
     .eq('user_id', userId)
     .eq('is_active', true)
 
   if (tErr) throw new Error(tErr.message)
   if (!templates || templates.length === 0) return
 
-  // Partial select typing can resolve to `never` with strict Supabase generics
-  const rows = templates as { id: string }[]
-  const logs: DailyLogInsert[] = rows.map((t) => ({
+  const rows = templates as {
+    id: string
+    recurrence: string | null
+    occurrence_date: string | null
+  }[]
+
+  const eligible = rows.filter((t) => {
+    const r = t.recurrence ?? 'daily'
+    if (r === 'daily') return true
+    if (r === 'once' && t.occurrence_date === today) return true
+    return false
+  })
+
+  if (eligible.length === 0) return
+
+  const logs: DailyLogInsert[] = eligible.map((t) => ({
     user_id: userId,
     task_template_id: t.id,
     date: today,
@@ -94,6 +115,7 @@ export async function updateLogStatus(
   if (error) throw new Error(error.message)
 
   revalidatePath('/')
+  revalidatePath('/weekly')
 }
 
 // ---------------------------------------------------------------------------
@@ -113,4 +135,28 @@ export async function updateLogNote(
     .eq('id', logId)
 
   if (error) throw new Error(error.message)
+
+  revalidatePath('/weekly')
+}
+
+// ---------------------------------------------------------------------------
+// fetchLogsBetweenDates — for weekly journal (read-only history)
+// ---------------------------------------------------------------------------
+export async function fetchLogsBetweenDates(
+  userId: string,
+  startDate: string,
+  endDate: string,
+): Promise<LogWithTemplate[]> {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('daily_logs')
+    .select('*, task_templates(*)')
+    .eq('user_id', userId)
+    .gte('date', startDate)
+    .lte('date', endDate)
+    .order('date', { ascending: false })
+
+  if (error) throw new Error(error.message)
+  return (data ?? []) as LogWithTemplate[]
 }

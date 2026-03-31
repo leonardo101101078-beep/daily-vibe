@@ -7,10 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import {
-  CATEGORY_STYLES,
-  DEFAULT_CATEGORY_STYLE,
-} from '@/lib/category-styles'
+import { labelForCategory, styleForCategory } from '@/lib/task-categories'
 import type { LogWithTemplate, TaskStatus } from '@/types/database'
 
 interface TaskItemProps {
@@ -27,8 +24,7 @@ export function TaskItem({ log, onToggle, onNoteChange }: TaskItemProps) {
   const isCompleted = log.status === 'completed'
   const hasProgress = template?.target_value != null
 
-  const catStyle =
-    CATEGORY_STYLES[template?.category ?? ''] ?? DEFAULT_CATEGORY_STYLE
+  const catStyle = styleForCategory(template?.category ?? '')
 
   const handleNoteBlur = () => {
     const original = log.note ?? ''
@@ -74,7 +70,7 @@ export function TaskItem({ log, onToggle, onNoteChange }: TaskItemProps) {
                     catStyle.text,
                   )}
                 >
-                  {template.category}
+                  {labelForCategory(template.category)}
                 </Badge>
               )}
             </div>

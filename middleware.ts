@@ -43,6 +43,7 @@ export async function middleware(request: NextRequest) {
   // All other routes (e.g. /, /templates) require a session.
   const isPublicPath =
     pathname.startsWith('/login') ||
+    pathname.startsWith('/register') ||
     pathname.startsWith('/auth')
 
   if (!user && !isPublicPath) {
@@ -51,8 +52,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // Authenticated users visiting /login → redirect to home
-  if (user && pathname === '/login') {
+  // Authenticated users visiting /login or /register → redirect to home
+  if (user && (pathname === '/login' || pathname === '/register')) {
     const homeUrl = request.nextUrl.clone()
     homeUrl.pathname = '/'
     return NextResponse.redirect(homeUrl)
