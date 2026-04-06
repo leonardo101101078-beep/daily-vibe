@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { Activity, Scale, UtensilsCrossed } from 'lucide-react'
+import { AppIcon } from '@/components/AppIcon'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -61,14 +62,18 @@ export function WellnessCard({ date, initial }: WellnessCardProps) {
   return (
     <section className="rounded-2xl border border-border/50 bg-bento-peach/80 px-4 py-4 shadow-sm transition-shadow duration-200 hover:shadow-md">
       <div className="mb-3 flex items-center gap-2">
-        <Activity className="h-4 w-4 text-primary" />
+        <AppIcon icon={Activity} size="sm" className="text-primary" />
         <h2 className="text-sm font-semibold">健康管理</h2>
       </div>
 
       <div className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="wellness-weight" className="flex items-center gap-1.5 text-xs">
-            <Scale className="h-3.5 w-3.5" />
+            <AppIcon
+              icon={Scale}
+              size="sm"
+              className="h-3.5 w-3.5"
+            />
             今日體重（kg）
           </Label>
           <Input
@@ -86,7 +91,11 @@ export function WellnessCard({ date, initial }: WellnessCardProps) {
 
         <div className="space-y-1.5">
           <Label htmlFor="wellness-diet" className="flex items-center gap-1.5 text-xs">
-            <UtensilsCrossed className="h-3.5 w-3.5" />
+            <AppIcon
+              icon={UtensilsCrossed}
+              size="sm"
+              className="h-3.5 w-3.5"
+            />
             飲食記錄
           </Label>
           <Textarea

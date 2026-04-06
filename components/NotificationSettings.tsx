@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { Clock, MapPin, Loader2 } from 'lucide-react'
+import { AppIcon } from '@/components/AppIcon'
 import { updateNotificationSettings } from '@/lib/actions/push'
 import type { NotificationSettingsRow } from '@/types/database'
 
@@ -32,7 +33,7 @@ export function NotificationSettings({ settings }: NotificationSettingsProps) {
     <div className="mt-3 rounded-xl border bg-muted/30 px-4 py-3 space-y-3">
       {/* Timezone badge */}
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <MapPin className="h-3 w-3" />
+        <AppIcon icon={MapPin} size="sm" className="h-3 w-3" />
         <span>{settings.timezone} (UTC+8)</span>
       </div>
 
@@ -72,17 +73,21 @@ export function NotificationSettings({ settings }: NotificationSettingsProps) {
       >
         {isPending ? (
           <>
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            <AppIcon
+              icon={Loader2}
+              size="sm"
+              className="h-3.5 w-3.5 animate-spin"
+            />
             儲存中…
           </>
         ) : saved ? (
           <>
-            <Clock className="h-3.5 w-3.5" />
+            <AppIcon icon={Clock} size="sm" className="h-3.5 w-3.5" />
             已儲存 ✓
           </>
         ) : (
           <>
-            <Clock className="h-3.5 w-3.5" />
+            <AppIcon icon={Clock} size="sm" className="h-3.5 w-3.5" />
             儲存提醒時間
           </>
         )}

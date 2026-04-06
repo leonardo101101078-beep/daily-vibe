@@ -3,6 +3,7 @@
 import { useTransition, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2, Plus } from 'lucide-react'
+import { AppIcon } from '@/components/AppIcon'
 import { createTaskTemplate } from '@/lib/actions/task-templates'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -231,9 +232,9 @@ export function TemplateForm() {
 
           <Button type="submit" disabled={isPending} className="w-full">
             {isPending ? (
-              <Loader2 className="animate-spin" />
+              <AppIcon icon={Loader2} size="md" className="animate-spin" />
             ) : (
-              <Plus className="h-4 w-4" />
+              <AppIcon icon={Plus} size="sm" />
             )}
             {isPending ? '建立中…' : '建立任務'}
           </Button>

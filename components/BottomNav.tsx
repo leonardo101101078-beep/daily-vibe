@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { CalendarCheck, CalendarDays, ListPlus, UserRound } from 'lucide-react'
+import { AppIcon } from '@/components/AppIcon'
 import { cn } from '@/lib/utils'
 
 const links = [
@@ -34,7 +35,11 @@ export function BottomNav() {
                   : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground',
               )}
             >
-              <Icon className="h-5 w-5 transition-transform duration-200" />
+              <AppIcon
+                icon={Icon}
+                size="md"
+                className="transition-transform duration-200"
+              />
               {label}
             </Link>
           )

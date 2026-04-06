@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { ArrowLeft, ListChecks } from 'lucide-react'
+import { AppIcon } from '@/components/AppIcon'
 import { createClient } from '@/lib/supabase/server'
 import { getTaskTemplates } from '@/lib/actions/task-templates'
 import { TemplateForm } from '@/components/TemplateForm'
@@ -80,10 +81,14 @@ export default async function TemplatesPage() {
             className="rounded-xl border border-border/60 bg-card p-2.5 text-muted-foreground shadow-sm transition-all duration-200 hover:bg-muted hover:text-foreground active:scale-95"
             aria-label="返回本日任務"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <AppIcon icon={ArrowLeft} size="sm" />
           </Link>
           <div className="flex min-w-0 flex-1 items-center gap-2">
-            <ListChecks className="h-6 w-6 shrink-0 text-primary" />
+            <AppIcon
+              icon={ListChecks}
+              size="lg"
+              className="shrink-0 text-primary"
+            />
             <h1 className="font-display text-2xl font-extrabold tracking-tight">
               新增任務
             </h1>

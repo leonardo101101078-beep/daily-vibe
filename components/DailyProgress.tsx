@@ -1,5 +1,6 @@
 import { Progress } from '@/components/ui/progress'
 import { Sparkles } from 'lucide-react'
+import { AppIcon } from '@/components/AppIcon'
 
 interface DailyProgressProps {
   completed: number
@@ -16,7 +17,11 @@ export function DailyProgress({ completed, total }: DailyProgressProps) {
         <div className="flex items-center gap-1.5">
           <span className="text-sm font-semibold">今日進度</span>
           {isAllDone && (
-            <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse" />
+            <AppIcon
+              icon={Sparkles}
+              size="sm"
+              className="h-3.5 w-3.5 text-primary animate-pulse"
+            />
           )}
         </div>
         <span className="text-sm text-muted-foreground">

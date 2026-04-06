@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { ArrowLeft, CalendarRange } from 'lucide-react'
+import { AppIcon } from '@/components/AppIcon'
 import { createClient } from '@/lib/supabase/server'
 import { fetchLogsBetweenDates } from '@/lib/actions/daily-logs'
 import { Card, CardContent } from '@/components/ui/card'
@@ -64,10 +65,14 @@ export default async function WeeklyPage() {
             className="rounded-xl border border-border/60 bg-card p-2.5 text-muted-foreground shadow-sm transition-all duration-200 hover:bg-muted hover:text-foreground active:scale-95"
             aria-label="返回本日任務"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <AppIcon icon={ArrowLeft} size="sm" />
           </Link>
           <div className="flex min-w-0 flex-1 items-center gap-2">
-            <CalendarRange className="h-6 w-6 shrink-0 text-primary" />
+            <AppIcon
+              icon={CalendarRange}
+              size="lg"
+              className="shrink-0 text-primary"
+            />
             <h1 className="font-display text-2xl font-extrabold tracking-tight">
               每周日誌
             </h1>

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { CalendarDays, Loader2, Lock, Mail } from 'lucide-react'
+import { AppIcon } from '@/components/AppIcon'
 import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
@@ -58,7 +59,11 @@ export default function LoginPage() {
         <div className="space-y-3 text-center">
           <div className="flex justify-center">
             <div className="rounded-2xl bg-primary/12 p-5 transition-transform duration-200 hover:scale-105">
-              <CalendarDays className="h-10 w-10 text-primary" />
+              <AppIcon
+                icon={CalendarDays}
+                size="md"
+                className="h-10 w-10 text-primary"
+              />
             </div>
           </div>
           <div>
@@ -73,7 +78,11 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} className="space-y-3">
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <AppIcon
+              icon={Mail}
+              size="sm"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            />
             <input
               type="email"
               placeholder="Email"
@@ -85,7 +94,11 @@ export default function LoginPage() {
             />
           </div>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <AppIcon
+              icon={Lock}
+              size="sm"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            />
             <input
               type="password"
               placeholder="密碼"
@@ -105,7 +118,7 @@ export default function LoginPage() {
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-md transition-all duration-200 hover:brightness-105 active:scale-[0.98] disabled:opacity-60"
           >
             {loading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <AppIcon icon={Loader2} size="sm" className="animate-spin" />
             ) : null}
             {loading ? '登入中…' : '登入'}
           </button>

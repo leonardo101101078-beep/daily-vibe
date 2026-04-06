@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useTransition } from 'react'
 import { Bell, BellOff, BellRing, Loader2 } from 'lucide-react'
+import { AppIcon } from '@/components/AppIcon'
 import { subscribePush, unsubscribePush, updateNotificationSettings } from '@/lib/actions/push'
 import { NotificationSettings } from '@/components/NotificationSettings'
 import type { NotificationSettingsRow } from '@/types/database'
@@ -153,7 +154,7 @@ export function NotificationToggle({ initialSettings }: NotificationToggleProps)
       <div className="rounded-xl border px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="rounded-full bg-primary/10 p-2">
-            <Bell className="h-4 w-4 text-primary" />
+            <AppIcon icon={Bell} size="sm" className="text-primary" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium">每日提醒</p>
@@ -167,9 +168,13 @@ export function NotificationToggle({ initialSettings }: NotificationToggleProps)
             className="flex shrink-0 items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-opacity disabled:opacity-60"
           >
             {isPending ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <AppIcon
+                icon={Loader2}
+                size="sm"
+                className="h-3.5 w-3.5 animate-spin"
+              />
             ) : (
-              <BellRing className="h-3.5 w-3.5" />
+              <AppIcon icon={BellRing} size="sm" className="h-3.5 w-3.5" />
             )}
             {isPending ? '設定中…' : '開啟提醒'}
           </button>
@@ -183,7 +188,7 @@ export function NotificationToggle({ initialSettings }: NotificationToggleProps)
     <div className="rounded-xl border px-4 py-3">
       <div className="flex items-center gap-3">
         <div className="rounded-full bg-primary/10 p-2">
-          <BellRing className="h-4 w-4 text-primary" />
+          <AppIcon icon={BellRing} size="sm" className="text-primary" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium">每日提醒已開啟</p>
@@ -197,9 +202,13 @@ export function NotificationToggle({ initialSettings }: NotificationToggleProps)
           className="flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground disabled:opacity-60"
         >
           {isPending ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            <AppIcon
+              icon={Loader2}
+              size="sm"
+              className="h-3.5 w-3.5 animate-spin"
+            />
           ) : (
-            <BellOff className="h-3.5 w-3.5" />
+            <AppIcon icon={BellOff} size="sm" className="h-3.5 w-3.5" />
           )}
           {isPending ? '處理中…' : '關閉'}
         </button>

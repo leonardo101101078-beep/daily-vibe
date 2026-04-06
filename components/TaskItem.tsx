@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { NotebookPen, ChevronDown, ChevronUp } from 'lucide-react'
+import { NotebookPen, ChevronUp } from 'lucide-react'
+import { AppIcon } from '@/components/AppIcon'
 import { Card, CardContent } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Textarea } from '@/components/ui/textarea'
@@ -101,9 +102,9 @@ export function TaskItem({ log, onToggle, onNoteChange }: TaskItemProps) {
             aria-label={noteOpen ? '收起備註' : '展開備註'}
           >
             {noteOpen ? (
-              <ChevronUp className="h-4 w-4" />
+              <AppIcon icon={ChevronUp} size="sm" />
             ) : (
-              <NotebookPen className="h-4 w-4" />
+              <AppIcon icon={NotebookPen} size="sm" />
             )}
           </button>
         </div>

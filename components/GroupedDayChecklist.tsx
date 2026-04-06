@@ -3,6 +3,7 @@
 import { useOptimistic, useTransition } from 'react'
 import Link from 'next/link'
 import { ClipboardList, Plus } from 'lucide-react'
+import { AppIcon } from '@/components/AppIcon'
 import { Button } from '@/components/ui/button'
 import { DailyProgress } from '@/components/DailyProgress'
 import { TaskItem } from '@/components/TaskItem'
@@ -73,7 +74,11 @@ export function GroupedDayChecklist({ initialLogs }: GroupedDayChecklistProps) {
     return (
       <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
         <div className="rounded-2xl bg-muted p-5">
-          <ClipboardList className="h-8 w-8 text-muted-foreground" />
+          <AppIcon
+            icon={ClipboardList}
+            size="sm"
+            className="h-8 w-8 text-muted-foreground"
+          />
         </div>
         <p className="mt-4 text-sm font-medium">今天還沒有任何任務</p>
         <p className="mt-1 text-xs text-muted-foreground">
@@ -81,7 +86,7 @@ export function GroupedDayChecklist({ initialLogs }: GroupedDayChecklistProps) {
         </p>
         <Button asChild className="mt-6">
           <Link href="/templates">
-            <Plus className="h-4 w-4" />
+            <AppIcon icon={Plus} size="sm" />
             新增任務
           </Link>
         </Button>

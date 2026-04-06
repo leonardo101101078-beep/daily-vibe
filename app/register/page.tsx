@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { CalendarDays, Loader2, Lock, Mail } from 'lucide-react'
+import { AppIcon } from '@/components/AppIcon'
 import { createClient } from '@/lib/supabase/client'
 
 export default function RegisterPage() {
@@ -47,7 +48,11 @@ export default function RegisterPage() {
         <div className="max-w-xs space-y-4 rounded-3xl border border-border/50 bg-card/90 p-6 shadow-xl backdrop-blur-sm">
           <div className="flex justify-center">
             <div className="rounded-2xl bg-primary/12 p-5">
-              <Mail className="h-10 w-10 text-primary" />
+              <AppIcon
+                icon={Mail}
+                size="md"
+                className="h-10 w-10 text-primary"
+              />
             </div>
           </div>
           <h1 className="font-display text-xl font-extrabold">請確認信箱</h1>
@@ -72,7 +77,11 @@ export default function RegisterPage() {
         <div className="space-y-3 text-center">
           <div className="flex justify-center">
             <div className="rounded-2xl bg-primary/12 p-5 transition-transform duration-200 hover:scale-105">
-              <CalendarDays className="h-10 w-10 text-primary" />
+              <AppIcon
+                icon={CalendarDays}
+                size="md"
+                className="h-10 w-10 text-primary"
+              />
             </div>
           </div>
           <div>
@@ -87,7 +96,11 @@ export default function RegisterPage() {
 
         <form onSubmit={handleRegister} className="space-y-3">
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <AppIcon
+              icon={Mail}
+              size="sm"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            />
             <input
               type="email"
               placeholder="Email"
@@ -99,7 +112,11 @@ export default function RegisterPage() {
             />
           </div>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <AppIcon
+              icon={Lock}
+              size="sm"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            />
             <input
               type="password"
               placeholder="密碼（至少 6 字元）"
@@ -119,7 +136,9 @@ export default function RegisterPage() {
             disabled={loading || !email || password.length < 6}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-md transition-all duration-200 hover:brightness-105 active:scale-[0.98] disabled:opacity-60"
           >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            {loading ? (
+              <AppIcon icon={Loader2} size="sm" className="animate-spin" />
+            ) : null}
             {loading ? '註冊中…' : '註冊'}
           </button>
         </form>

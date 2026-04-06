@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2, LogOut, Mail } from 'lucide-react'
+import { AppIcon } from '@/components/AppIcon'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -158,7 +159,11 @@ export function SettingsClient({ initialEmail, displayName, username }: Props) {
           <form onSubmit={handleUpdateEmail} className="space-y-3">
             <div className="space-y-2">
               <Label htmlFor="new-email" className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-muted-foreground" />
+                <AppIcon
+                  icon={Mail}
+                  size="sm"
+                  className="text-muted-foreground"
+                />
                 變更為新信箱
               </Label>
               <Input
@@ -175,7 +180,9 @@ export function SettingsClient({ initialEmail, displayName, username }: Props) {
               <p className="text-xs text-muted-foreground">{emailMsg}</p>
             ) : null}
             <Button type="submit" disabled={emailLoading || !newEmail.trim()}>
-              {emailLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {emailLoading ? (
+                <AppIcon icon={Loader2} size="sm" className="animate-spin" />
+              ) : null}
               送出變更（將寄驗證信）
             </Button>
           </form>
@@ -240,7 +247,9 @@ export function SettingsClient({ initialEmail, displayName, username }: Props) {
             <p className="text-xs text-muted-foreground">{exportMsg}</p>
           ) : null}
           <Button type="button" onClick={handleExport} disabled={exportLoading}>
-            {exportLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            {exportLoading ? (
+              <AppIcon icon={Loader2} size="sm" className="animate-spin" />
+            ) : null}
             產生 ZIP 並寄至信箱
           </Button>
         </CardContent>
@@ -259,9 +268,9 @@ export function SettingsClient({ initialEmail, displayName, username }: Props) {
             className="w-full sm:w-auto"
           >
             {logoutLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <AppIcon icon={Loader2} size="sm" className="animate-spin" />
             ) : (
-              <LogOut className="h-4 w-4" />
+              <AppIcon icon={LogOut} size="sm" />
             )}
             登出此裝置
           </Button>
@@ -290,7 +299,9 @@ export function SettingsClient({ initialEmail, displayName, username }: Props) {
             onClick={handleDelete}
             disabled={deleteLoading}
           >
-            {deleteLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            {deleteLoading ? (
+              <AppIcon icon={Loader2} size="sm" className="animate-spin" />
+            ) : null}
             刪除我的帳戶
           </Button>
         </CardContent>
