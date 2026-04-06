@@ -60,7 +60,7 @@ export async function middleware(request: NextRequest) {
   // Authenticated users visiting /login or /register → redirect to home
   if (user && (pathname === '/login' || pathname === '/register')) {
     const homeUrl = request.nextUrl.clone()
-    homeUrl.pathname = '/'
+    homeUrl.pathname = '/today'
     const res = NextResponse.redirect(homeUrl)
     res.headers.set(
       'Cache-Control',

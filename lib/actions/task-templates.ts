@@ -3,17 +3,15 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import type { TaskRecurrence, TaskTemplate } from '@/types/database'
-import { isPresetCategory, MAX_CUSTOM_CATEGORY_LEN } from '@/lib/task-categories'
+import { isPresetCategory } from '@/lib/task-categories'
+
+const REVALIDATE = ['/', '/today', '/templates', '/weekly', '/focus'] as const
 
 export interface CreateTaskTemplateInput {
   title: string
   description?: string | null
-  /** Preset key or custom label (trimmed) */
   category: string
-  /** When true, category is free text (must still pass length checks) */
-  categoryIsCustom?: boolean
   recurrence: TaskRecurrence
-  /** Required when recurrence === 'once', YYYY-MM-DD */
   occurrenceDate?: string | null
   targetValue?: number | null
   unit?: string | null
@@ -43,14 +41,14 @@ export async function getTaskTemplates(): Promise<TaskTemplate[]> {
   })
 }
 
-function normalizeCategory(input: CreateTaskTemplateInput): string {
-  const raw = input.category?.trim() ?? ''
-  if (input.categoryIsCustom) {
-    if (!raw) throw new Error('請輸入自訂類別名稱')
-    if (raw.length > MAX_CUSTOM_CATEGORY_LEN)
-      throw new Error(`自訂類別最多 ${MAX_CUSTOM_CATEGORY_LEN} 字`)
-    return raw
-  }
+/** Active templates only (for pickers / today management UI) */
+export async function getActiveTaskTemplates(): Promise<TaskTemplate[]> {
+  const all = await getTaskTemplates()
+  return all.filter((t) => t.is_active)
+}
+
+function normalizeCategory(category: string): string {
+  const raw = category?.trim() ?? ''
   if (!isPresetCategory(raw)) throw new Error('請選擇有效類別')
   return raw
 }
@@ -67,7 +65,7 @@ export async function createTaskTemplate(
   const title = input.title?.trim()
   if (!title) throw new Error('標題為必填')
 
-  const category = normalizeCategory(input)
+  const category = normalizeCategory(input.category)
 
   const recurrence = input.recurrence
   if (recurrence !== 'daily' && recurrence !== 'once') {
@@ -119,7 +117,23 @@ export async function createTaskTemplate(
 
   if (error) throw new Error(error.message)
 
-  revalidatePath('/')
-  revalidatePath('/templates')
-  revalidatePath('/weekly')
+  for (const p of REVALIDATE) revalidatePath(p)
+}
+
+export async function deactivateTaskTemplate(templateId: string): Promise<void> {
+  const supabase = createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
+  const { error } = await supabase
+    .from('task_templates')
+    .update({ is_active: false })
+    .eq('id', templateId)
+    .eq('user_id', user.id)
+
+  if (error) throw new Error(error.message)
+
+  for (const p of REVALIDATE) revalidatePath(p)
 }

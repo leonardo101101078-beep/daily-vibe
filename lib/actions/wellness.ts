@@ -62,5 +62,5 @@ export async function upsertWellness(
   )
 
   if (error) throw new Error(error.message)
-  revalidatePath('/')
+  revalidatePath('/today')
 }

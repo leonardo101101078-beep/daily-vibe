@@ -35,7 +35,7 @@ export default function RegisterPage() {
       return
     }
     if (data.session) {
-      router.replace('/')
+      router.replace('/today')
       router.refresh()
       return
     }

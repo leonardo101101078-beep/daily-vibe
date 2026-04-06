@@ -2,15 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CalendarCheck, CalendarDays, ListPlus, UserRound } from 'lucide-react'
+import { CalendarCheck, CalendarDays, Target, UserRound } from 'lucide-react'
 import { AppIcon } from '@/components/AppIcon'
 import { cn } from '@/lib/utils'
 
 const links = [
-  { href: '/', label: '本日', icon: CalendarCheck },
-  { href: '/weekly', label: '每周', icon: CalendarDays },
-  { href: '/templates', label: '新增', icon: ListPlus },
-  { href: '/settings', label: '帳號', icon: UserRound },
+  { href: '/focus', label: '重點', icon: Target },
+  { href: '/today', label: '今日', icon: CalendarCheck },
+  { href: '/weekly', label: '每週', icon: CalendarDays },
+  { href: '/settings', label: '個人', icon: UserRound },
 ] as const
 
 export function BottomNav() {
@@ -21,9 +21,9 @@ export function BottomNav() {
       <div className="flex items-stretch justify-around px-1 pt-1">
         {links.map(({ href, label, icon: Icon }) => {
           const active =
-            href === '/'
-              ? pathname === '/'
-              : pathname.startsWith(href)
+            href === '/today'
+              ? pathname === '/today' || pathname === '/'
+              : pathname === href || pathname.startsWith(`${href}/`)
           return (
             <Link
               key={href}

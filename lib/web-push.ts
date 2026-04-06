@@ -6,13 +6,16 @@
 
 import webPush from 'web-push'
 
-// VAPID credentials are set once at module-load time.
-// The module is cached by Node.js, so setVapidDetails() runs exactly once.
-webPush.setVapidDetails(
-  process.env.VAPID_SUBJECT!,
-  process.env.VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!,
-)
+const subj = process.env.VAPID_SUBJECT
+const pub = process.env.VAPID_PUBLIC_KEY
+const priv = process.env.VAPID_PRIVATE_KEY
+if (subj && pub && priv) {
+  try {
+    webPush.setVapidDetails(subj, pub, priv)
+  } catch {
+    /* invalid keys in dev / CI — push disabled until env fixed */
+  }
+}
 
 export interface PushPayload {
   title: string

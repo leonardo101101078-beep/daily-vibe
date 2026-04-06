@@ -63,7 +63,7 @@ export function TaskChecklist({ initialLogs }: TaskChecklistProps) {
           新增任務模板後，每天開啟 App 就會自動生成今日清單。
         </p>
         <Button asChild className="mt-6">
-          <Link href="/templates">
+          <Link href="/today#add-task">
             <AppIcon icon={Plus} size="sm" />
             新增任務模板
           </Link>

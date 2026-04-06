@@ -85,7 +85,7 @@ export function GroupedDayChecklist({ initialLogs }: GroupedDayChecklistProps) {
           到「新增任務」建立模板後，每天會自動出現在清單中。
         </p>
         <Button asChild className="mt-6">
-          <Link href="/templates">
+          <Link href="/today#add-task">
             <AppIcon icon={Plus} size="sm" />
             新增任務
           </Link>

@@ -13,10 +13,15 @@ import type {
 // Idempotently generates daily_log rows for every active task_template.
 // Safe to call on every page load — uses ON CONFLICT DO NOTHING via upsert.
 // ---------------------------------------------------------------------------
+/** Seeds logs for `day`. Skips if `day` is after `calendarToday` (future days). */
 export async function seedTodayLogs(
   userId: string,
-  today: string, // ISO date string: "YYYY-MM-DD"
+  day: string, // ISO date string: "YYYY-MM-DD"
+  calendarToday?: string,
 ): Promise<void> {
+  const cap = calendarToday ?? day
+  if (day > cap) return
+
   const supabase = createClient()
 
   // Auto-deactivate one-off templates whose date has passed
@@ -25,7 +30,7 @@ export async function seedTodayLogs(
     .update({ is_active: false })
     .eq('user_id', userId)
     .eq('recurrence', 'once')
-    .lt('occurrence_date', today)
+    .lt('occurrence_date', cap)
 
   const { data: templates, error: tErr } = await supabase
     .from('task_templates')
@@ -45,7 +50,7 @@ export async function seedTodayLogs(
   const eligible = rows.filter((t) => {
     const r = t.recurrence ?? 'daily'
     if (r === 'daily') return true
-    if (r === 'once' && t.occurrence_date === today) return true
+    if (r === 'once' && t.occurrence_date === day) return true
     return false
   })
 
@@ -54,7 +59,7 @@ export async function seedTodayLogs(
   const logs: DailyLogInsert[] = eligible.map((t) => ({
     user_id: userId,
     task_template_id: t.id,
-    date: today,
+    date: day,
     status: 'pending',
     note: null,
     progress: null,
@@ -115,6 +120,7 @@ export async function updateLogStatus(
   if (error) throw new Error(error.message)
 
   revalidatePath('/')
+  revalidatePath('/today')
   revalidatePath('/weekly')
 }
 
@@ -136,6 +142,7 @@ export async function updateLogNote(
 
   if (error) throw new Error(error.message)
 
+  revalidatePath('/today')
   revalidatePath('/weekly')
 }
 

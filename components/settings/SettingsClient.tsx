@@ -11,6 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { ExportBody } from '@/lib/account/export-types'
+import { updateDisplayName } from '@/lib/actions/profile'
 
 const DELETE_CONFIRM_PHRASE = '確認刪除'
 
@@ -22,6 +23,9 @@ type Props = {
 
 export function SettingsClient({ initialEmail, displayName, username }: Props) {
   const router = useRouter()
+  const [nameValue, setNameValue] = useState(displayName ?? '')
+  const [nameLoading, setNameLoading] = useState(false)
+  const [nameMsg, setNameMsg] = useState('')
   const [email, setEmail] = useState(initialEmail)
   const [newEmail, setNewEmail] = useState('')
   const [emailLoading, setEmailLoading] = useState(false)
@@ -39,11 +43,57 @@ export function SettingsClient({ initialEmail, displayName, username }: Props) {
   const [exportLoading, setExportLoading] = useState(false)
   const [exportMsg, setExportMsg] = useState('')
 
+  const [wrFrom, setWrFrom] = useState('')
+  const [wrTo, setWrTo] = useState('')
+  const [wrLoading, setWrLoading] = useState(false)
+  const [wrMsg, setWrMsg] = useState('')
+
   const [logoutLoading, setLogoutLoading] = useState(false)
 
   const [deleteConfirm, setDeleteConfirm] = useState('')
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deleteMsg, setDeleteMsg] = useState('')
+
+  const handleUpdateName = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setNameLoading(true)
+    setNameMsg('')
+    try {
+      await updateDisplayName(nameValue)
+      setNameMsg('已儲存名稱')
+      router.refresh()
+    } catch (err) {
+      setNameMsg(err instanceof Error ? err.message : '儲存失敗')
+    } finally {
+      setNameLoading(false)
+    }
+  }
+
+  const handleWeeklyReport = async () => {
+    if (!wrFrom || !wrTo) {
+      setWrMsg('請選擇起始與結束日期')
+      return
+    }
+    setWrLoading(true)
+    setWrMsg('')
+    try {
+      const res = await fetch('/api/account/weekly-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dateFrom: wrFrom, dateTo: wrTo }),
+      })
+      const data = (await res.json()) as { ok?: boolean; message?: string; error?: string }
+      if (!res.ok) {
+        setWrMsg(data.error ?? '寄送失敗')
+        return
+      }
+      setWrMsg(data.message ?? '已寄出')
+    } catch {
+      setWrMsg('網路錯誤')
+    } finally {
+      setWrLoading(false)
+    }
+  }
 
   const handleUpdateEmail = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -136,16 +186,33 @@ export function SettingsClient({ initialEmail, displayName, username }: Props) {
       <Card>
         <CardHeader className="space-y-1 pb-4">
           <CardTitle className="text-lg">個人資訊</CardTitle>
-          <CardDescription>顯示名稱與使用者名稱（與資料庫同步）</CardDescription>
+          <CardDescription>顯示名稱可編輯；使用者名稱（username）由系統同步。</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm">
-          <p>
-            <span className="text-muted-foreground">顯示名稱：</span>
-            {displayName ?? '—'}
-          </p>
-          <p>
-            <span className="text-muted-foreground">使用者名稱：</span>
-            {username ?? '—'}
+        <CardContent>
+          <form onSubmit={handleUpdateName} className="space-y-3">
+            <div className="space-y-2">
+              <Label htmlFor="display-name">顯示名稱</Label>
+              <Input
+                id="display-name"
+                value={nameValue}
+                onChange={(e) => setNameValue(e.target.value)}
+                placeholder="你的名字"
+                className="rounded-xl"
+                maxLength={80}
+              />
+            </div>
+            {nameMsg ? (
+              <p className="text-xs text-muted-foreground">{nameMsg}</p>
+            ) : null}
+            <Button type="submit" disabled={nameLoading}>
+              {nameLoading ? (
+                <AppIcon icon={Loader2} size="sm" className="animate-spin" />
+              ) : null}
+              儲存名稱
+            </Button>
+          </form>
+          <p className="mt-4 text-sm text-muted-foreground">
+            使用者名稱：<span className="text-foreground">{username ?? '—'}</span>
           </p>
         </CardContent>
       </Card>
@@ -191,7 +258,49 @@ export function SettingsClient({ initialEmail, displayName, username }: Props) {
 
       <Card>
         <CardHeader className="space-y-1 pb-4">
-          <CardTitle className="text-lg">匯出資料</CardTitle>
+          <CardTitle className="text-lg">匯出週報</CardTitle>
+          <CardDescription>
+            選擇日期區間，將摘要週報寄至目前登入信箱（{email || '—'}）。
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="wr-from">起始日</Label>
+              <Input
+                id="wr-from"
+                type="date"
+                value={wrFrom}
+                onChange={(e) => setWrFrom(e.target.value)}
+                className="rounded-xl"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="wr-to">結束日</Label>
+              <Input
+                id="wr-to"
+                type="date"
+                value={wrTo}
+                onChange={(e) => setWrTo(e.target.value)}
+                className="rounded-xl"
+              />
+            </div>
+          </div>
+          {wrMsg ? (
+            <p className="text-xs text-muted-foreground">{wrMsg}</p>
+          ) : null}
+          <Button type="button" onClick={handleWeeklyReport} disabled={wrLoading}>
+            {wrLoading ? (
+              <AppIcon icon={Loader2} size="sm" className="animate-spin" />
+            ) : null}
+            寄送週報至信箱
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="space-y-1 pb-4">
+          <CardTitle className="text-lg">完整資料匯出（ZIP）</CardTitle>
           <CardDescription>
             勾選要匯出的區塊，可選日期範圍（適用於日誌、健康、回顧；模板與個人檔為全量）。ZIP 內含 CSV，將寄至目前登入信箱。
           </CardDescription>

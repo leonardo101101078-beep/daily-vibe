@@ -30,7 +30,7 @@ export default function LoginPage() {
       setError(error.message)
       return
     }
-    router.replace('/')
+    router.replace('/today')
     router.refresh()
   }
 

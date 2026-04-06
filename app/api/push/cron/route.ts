@@ -45,13 +45,13 @@ function buildPayload(slot: 'morning' | 'evening') {
     return {
       title: '早安！今日任務來了 ☀️',
       body: '打開 DailyVibe，確認今天的待辦清單。',
-      url: '/',
+      url: '/today',
     }
   }
   return {
     title: '今天過得如何？🌙',
     body: '花幾分鐘回顧今日進度，規劃明天的計畫。',
-    url: '/',
+    url: '/today',
   }
 }
 

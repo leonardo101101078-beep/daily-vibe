@@ -165,6 +165,50 @@ export type SubscriptionInsert = Omit<SubscriptionRow, 'id' | 'created_at'>
 
 export type NotificationSettingsUpsert = Omit<NotificationSettingsRow, 'updated_at'>
 
+export interface AnnualGoalRow {
+  id: string
+  user_id: string
+  title: string
+  sort_order: number
+  created_at: string
+  updated_at: string
+}
+
+export interface MonthlyGoalRow {
+  id: string
+  user_id: string
+  year: number
+  month: number
+  title: string
+  sort_order: number
+  created_at: string
+  updated_at: string
+}
+
+export interface WeeklyGoalRow {
+  id: string
+  user_id: string
+  week_start: string
+  title: string
+  sort_order: number
+  created_at: string
+  updated_at: string
+}
+
+export type AnnualGoalInsert = Omit<AnnualGoalRow, 'id' | 'created_at' | 'updated_at'>
+export type MonthlyGoalInsert = Omit<MonthlyGoalRow, 'id' | 'created_at' | 'updated_at'>
+export type WeeklyGoalInsert = Omit<WeeklyGoalRow, 'id' | 'created_at' | 'updated_at'>
+
+export type AnnualGoalUpdate = Partial<
+  Omit<AnnualGoalRow, 'id' | 'user_id' | 'created_at' | 'updated_at'>
+>
+export type MonthlyGoalUpdate = Partial<
+  Omit<MonthlyGoalRow, 'id' | 'user_id' | 'created_at' | 'updated_at'>
+>
+export type WeeklyGoalUpdate = Partial<
+  Omit<WeeklyGoalRow, 'id' | 'user_id' | 'created_at' | 'updated_at'>
+>
+
 // ---------------------------------------------------------------------------
 // Database root interface — pass as generic to createClient<Database>()
 // ---------------------------------------------------------------------------
@@ -212,6 +256,24 @@ export interface Database {
         Row: DailyWellnessRow
         Insert: DailyWellnessInsert
         Update: DailyWellnessUpdate
+        Relationships: []
+      }
+      annual_goals: {
+        Row: AnnualGoalRow
+        Insert: AnnualGoalInsert
+        Update: AnnualGoalUpdate
+        Relationships: []
+      }
+      monthly_goals: {
+        Row: MonthlyGoalRow
+        Insert: MonthlyGoalInsert
+        Update: MonthlyGoalUpdate
+        Relationships: []
+      }
+      weekly_goals: {
+        Row: WeeklyGoalRow
+        Insert: WeeklyGoalInsert
+        Update: WeeklyGoalUpdate
         Relationships: []
       }
     }
