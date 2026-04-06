@@ -23,7 +23,6 @@ export function TaskItem({ log, onToggle, onNoteChange }: TaskItemProps) {
 
   const template = log.task_templates
   const isCompleted = log.status === 'completed'
-  const hasProgress = template?.target_value != null
 
   const catStyle = styleForCategory(template?.category ?? '')
 
@@ -79,12 +78,6 @@ export function TaskItem({ log, onToggle, onNoteChange }: TaskItemProps) {
             {template?.description && (
               <p className="mt-0.5 text-xs text-muted-foreground">
                 {template.description}
-              </p>
-            )}
-
-            {hasProgress && (
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                {log.progress ?? 0} / {template.target_value} {template.unit}
               </p>
             )}
           </div>

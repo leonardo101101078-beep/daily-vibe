@@ -3,6 +3,12 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { listWeeklyGoals } from '@/lib/actions/goals'
 import { mondayOfWeekContaining, weekDayLabels } from '@/lib/week'
+import {
+  buildMonthGrid,
+  parseYearMonth,
+  shiftYearMonth,
+  parseLocalDate,
+} from '@/lib/month-calendar'
 import { WeeklyGoalsClient } from '@/components/weekly/WeeklyGoalsClient'
 import { cn } from '@/lib/utils'
 
@@ -11,22 +17,17 @@ function getLocalDateString(): string {
   return now.toISOString().slice(0, 10)
 }
 
-function parseLocalDate(dateStr: string): Date {
-  const [y, m, d] = dateStr.split('-').map(Number)
-  return new Date(y, m - 1, d)
-}
-
-function formatLocalDate(d: Date): string {
-  const yy = d.getFullYear()
-  const mm = String(d.getMonth() + 1).padStart(2, '0')
-  const dd = String(d.getDate()).padStart(2, '0')
-  return `${yy}-${mm}-${dd}`
+function formatMonthParam(y: number, m: number): string {
+  return `${y}-${String(m).padStart(2, '0')}`
 }
 
 function addDays(dateStr: string, days: number): string {
   const d = parseLocalDate(dateStr)
   d.setDate(d.getDate() + days)
-  return formatLocalDate(d)
+  const yy = d.getFullYear()
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  return `${yy}-${mm}-${dd}`
 }
 
 export const metadata = {
@@ -36,7 +37,7 @@ export const metadata = {
 export default async function WeeklyPage({
   searchParams,
 }: {
-  searchParams: { week?: string }
+  searchParams: { week?: string; month?: string }
 }) {
   const supabase = createClient()
   const {
@@ -56,15 +57,35 @@ export default async function WeeklyPage({
   const prevWeekStart = addDays(weekStart, -7)
   const nextWeekStart = addDays(weekStart, 7)
 
+  const fallbackMonth = parseLocalDate(weekStart)
+  const { year: calYear, month: calMonth } = parseYearMonth(
+    searchParams.month,
+    fallbackMonth,
+  )
+  const monthGrid = buildMonthGrid(calYear, calMonth)
+  const prevCal = shiftYearMonth(calYear, calMonth, -1)
+  const nextCal = shiftYearMonth(calYear, calMonth, 1)
+  const weekQuery = `week=${encodeURIComponent(weekStart)}`
+
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-md px-5 pb-28 pt-8">
-        <h1 className="font-display text-2xl font-extrabold tracking-tight">
-          每週目標
-        </h1>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          設定本週方向，並點選日期查看當日的今日事項。
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="font-display text-2xl font-extrabold tracking-tight">
+              每週目標
+            </h1>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              設定本週方向，並點選日期查看當日的今日事項。
+            </p>
+          </div>
+          <Link
+            href="/weekly/record"
+            className="shrink-0 rounded-full border border-border/60 bg-card px-3 py-1.5 text-sm font-medium shadow-sm transition-colors hover:bg-muted/80"
+          >
+            紀錄
+          </Link>
+        </div>
 
         <div className="mt-6">
           <WeeklyGoalsClient
@@ -105,6 +126,81 @@ export default async function WeeklyPage({
               )
             })}
           </ul>
+        </div>
+
+        <div className="mt-10">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold text-muted-foreground">
+              月曆
+            </h2>
+            <div className="flex items-center gap-2 text-sm">
+              <Link
+                href={`/weekly?${weekQuery}&month=${formatMonthParam(prevCal.year, prevCal.month)}`}
+                className="rounded-lg border border-border/60 px-2 py-1 text-xs font-medium hover:bg-muted/80"
+              >
+                上月
+              </Link>
+              <span className="tabular-nums text-muted-foreground">
+                {calYear} 年 {calMonth} 月
+              </span>
+              <Link
+                href={`/weekly?${weekQuery}&month=${formatMonthParam(nextCal.year, nextCal.month)}`}
+                className="rounded-lg border border-border/60 px-2 py-1 text-xs font-medium hover:bg-muted/80"
+              >
+                下月
+              </Link>
+            </div>
+          </div>
+          <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-medium text-muted-foreground">
+            {['一', '二', '三', '四', '五', '六', '日'].map((d) => (
+              <div key={d} className="py-1">
+                {d}
+              </div>
+            ))}
+          </div>
+          <div className="mt-1 space-y-1">
+            {monthGrid.map((row, ri) => (
+              <div key={ri} className="grid grid-cols-7 gap-1">
+                {row.map((cell, ci) => {
+                  if (!cell.date) {
+                    return (
+                      <div
+                        key={`pad-${ri}-${ci}`}
+                        className="aspect-square rounded-lg bg-transparent"
+                      />
+                    )
+                  }
+                  const isToday = cell.date === calendarToday
+                  const isFuture = cell.date > calendarToday
+                  if (isFuture) {
+                    return (
+                      <span
+                        key={cell.date}
+                        className="flex aspect-square items-center justify-center rounded-lg border border-transparent text-sm font-medium tabular-nums opacity-35"
+                      >
+                        {cell.dayNum}
+                      </span>
+                    )
+                  }
+                  return (
+                    <Link
+                      key={cell.date}
+                      href={`/today?date=${cell.date}`}
+                      className={cn(
+                        'flex aspect-square items-center justify-center rounded-lg border border-border/60 bg-card text-sm font-medium tabular-nums transition-colors hover:bg-muted/80',
+                        isToday && 'border-primary bg-primary/10 font-bold',
+                      )}
+                    >
+                      {cell.dayNum}
+                    </Link>
+                  )
+                })}
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            點選日期可開啟當日清單。未來日期無法點選。
+          </p>
         </div>
       </div>
     </main>

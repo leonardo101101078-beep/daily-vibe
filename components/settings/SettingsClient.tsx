@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2, LogOut, Mail } from 'lucide-react'
 import { AppIcon } from '@/components/AppIcon'
@@ -53,6 +53,10 @@ export function SettingsClient({ initialEmail, displayName, username }: Props) {
   const [deleteConfirm, setDeleteConfirm] = useState('')
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deleteMsg, setDeleteMsg] = useState('')
+
+  useEffect(() => {
+    setNameValue(displayName ?? '')
+  }, [displayName])
 
   const handleUpdateName = async (e: React.FormEvent) => {
     e.preventDefault()

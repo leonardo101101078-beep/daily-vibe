@@ -31,8 +31,12 @@ export interface ProfileRow {
   updated_at: string
 }
 
-/** `daily` = seed every day; `once` = only on occurrence_date */
-export type TaskRecurrence = 'daily' | 'once'
+/** `daily` | `weekly` | `every_other_day` = recurring; `once` = single occurrence_date */
+export type TaskRecurrence =
+  | 'daily'
+  | 'once'
+  | 'weekly'
+  | 'every_other_day'
 
 export interface TaskTemplateRow {
   id: string
@@ -48,6 +52,9 @@ export interface TaskTemplateRow {
   unit: string | null
   recurrence: TaskRecurrence
   occurrence_date: string | null // ISO date when recurrence === 'once'
+  /** 0=Mon .. 6=Sun when recurrence === 'weekly' */
+  recurrence_weekday: number | null
+  alternate_anchor_date: string | null // ISO date when recurrence === 'every_other_day'
   created_at: string
   updated_at: string
 }

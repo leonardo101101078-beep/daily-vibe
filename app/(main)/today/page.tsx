@@ -42,6 +42,9 @@ export const metadata = {
   title: '今日事項 | DailyVibe',
 }
 
+/** 避免快取導致新增任務／seed 後仍顯示舊清單 */
+export const dynamic = 'force-dynamic'
+
 export default async function TodayPage({
   searchParams,
 }: {
@@ -142,7 +145,10 @@ export default async function TodayPage({
           style={{ animationDelay: '210ms' }}
         >
           <div className="overflow-hidden rounded-2xl border border-border/50 bg-card/90 shadow-sm backdrop-blur-sm">
-            <GroupedDayChecklist initialLogs={logs} />
+            <GroupedDayChecklist
+              key={logs.map((l) => l.id).join('|')}
+              initialLogs={logs}
+            />
           </div>
         </div>
 

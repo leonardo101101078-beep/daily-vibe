@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { createClient } from '@/lib/supabase/server'
-import { fetchLogsBetweenDates } from '@/lib/actions/daily-logs'
 
 export const runtime = 'nodejs'
 
@@ -53,7 +52,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: '起始日不可晚於結束日' }, { status: 400 })
   }
 
-  const logs = await fetchLogsBetweenDates(user.id, dateFrom, dateTo)
+  /** Aggregate only — no task template titles or join to profiles. */
+  const { data: logRows, error: logsErr } = await supabase
+    .from('daily_logs')
+    .select('date, status')
+    .eq('user_id', user.id)
+    .gte('date', dateFrom)
+    .lte('date', dateTo)
+
+  if (logsErr) {
+    return NextResponse.json({ error: logsErr.message }, { status: 500 })
+  }
 
   const { data: wellnessRows } = await supabase
     .from('daily_wellness')
@@ -72,7 +81,7 @@ export async function POST(request: Request) {
     .order('date', { ascending: true })
 
   const byDate = new Map<string, { done: number; total: number }>()
-  for (const log of logs) {
+  for (const log of logRows ?? []) {
     const d = log.date
     if (!byDate.has(d)) byDate.set(d, { done: 0, total: 0 })
     const x = byDate.get(d)!

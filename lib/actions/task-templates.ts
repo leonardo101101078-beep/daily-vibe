@@ -13,8 +13,10 @@ export interface CreateTaskTemplateInput {
   category: string
   recurrence: TaskRecurrence
   occurrenceDate?: string | null
-  targetValue?: number | null
-  unit?: string | null
+  /** 0=Mon .. 6=Sun when recurrence === 'weekly' */
+  recurrenceWeekday?: number | null
+  /** ISO date anchor when recurrence === 'every_other_day' */
+  alternateAnchorDate?: string | null
 }
 
 export async function getTaskTemplates(): Promise<TaskTemplate[]> {
@@ -37,6 +39,8 @@ export async function getTaskTemplates(): Promise<TaskTemplate[]> {
       ...r,
       recurrence: r.recurrence ?? 'daily',
       occurrence_date: r.occurrence_date ?? null,
+      recurrence_weekday: r.recurrence_weekday ?? null,
+      alternate_anchor_date: r.alternate_anchor_date ?? null,
     }
   })
 }
@@ -53,6 +57,8 @@ function normalizeCategory(category: string): string {
   return raw
 }
 
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
+
 export async function createTaskTemplate(
   input: CreateTaskTemplateInput,
 ): Promise<void> {
@@ -68,17 +74,38 @@ export async function createTaskTemplate(
   const category = normalizeCategory(input.category)
 
   const recurrence = input.recurrence
-  if (recurrence !== 'daily' && recurrence !== 'once') {
+  const allowed: TaskRecurrence[] = [
+    'daily',
+    'once',
+    'weekly',
+    'every_other_day',
+  ]
+  if (!allowed.includes(recurrence)) {
     throw new Error('無效的任務類型')
   }
 
   let occurrenceDate: string | null = null
+  let recurrenceWeekday: number | null = null
+  let alternateAnchorDate: string | null = null
+
   if (recurrence === 'once') {
     const d = input.occurrenceDate?.trim()
-    if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+    if (!d || !ISO_DATE.test(d)) {
       throw new Error('單一任務請選擇日期')
     }
     occurrenceDate = d
+  } else if (recurrence === 'weekly') {
+    const w = input.recurrenceWeekday
+    if (w == null || w < 0 || w > 6 || !Number.isInteger(w)) {
+      throw new Error('每週任務請選擇星期')
+    }
+    recurrenceWeekday = w
+  } else if (recurrence === 'every_other_day') {
+    const a = input.alternateAnchorDate?.trim()
+    if (!a || !ISO_DATE.test(a)) {
+      throw new Error('隔日任務請選擇起始日期')
+    }
+    alternateAnchorDate = a
   }
 
   const { data: last } = await supabase
@@ -91,15 +118,6 @@ export async function createTaskTemplate(
 
   const sortOrder = (last?.sort_order ?? -1) + 1
 
-  const targetValue =
-    input.targetValue != null && !Number.isNaN(Number(input.targetValue))
-      ? Number(input.targetValue)
-      : null
-  const unit =
-    targetValue != null && input.unit?.trim()
-      ? input.unit.trim()
-      : null
-
   const { error } = await supabase.from('task_templates').insert({
     user_id: user.id,
     title,
@@ -107,12 +125,14 @@ export async function createTaskTemplate(
     category,
     sort_order: sortOrder,
     is_active: true,
-    target_value: targetValue,
-    unit,
+    target_value: null,
+    unit: null,
     icon: null,
     color: null,
     recurrence,
     occurrence_date: occurrenceDate,
+    recurrence_weekday: recurrenceWeekday,
+    alternate_anchor_date: alternateAnchorDate,
   })
 
   if (error) throw new Error(error.message)

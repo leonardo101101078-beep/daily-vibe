@@ -2,21 +2,44 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { calendarDaysBetween, mondayBasedWeekday } from '@/lib/recurrence-helpers'
 import type {
   TaskStatus,
   LogWithTemplate,
   DailyLogInsert,
 } from '@/types/database'
 
-// ---------------------------------------------------------------------------
-// seedTodayLogs
-// Idempotently generates daily_log rows for every active task_template.
-// Safe to call on every page load — uses ON CONFLICT DO NOTHING via upsert.
-// ---------------------------------------------------------------------------
+type TemplateSeedRow = {
+  id: string
+  recurrence: string | null
+  occurrence_date: string | null
+  recurrence_weekday: number | null
+  alternate_anchor_date: string | null
+}
+
+function isEligibleForDay(t: TemplateSeedRow, day: string): boolean {
+  const r = t.recurrence ?? 'daily'
+  switch (r) {
+    case 'daily':
+      return true
+    case 'once':
+      return t.occurrence_date === day
+    case 'weekly':
+      if (t.recurrence_weekday == null) return false
+      return mondayBasedWeekday(day) === t.recurrence_weekday
+    case 'every_other_day':
+      if (!t.alternate_anchor_date) return false
+      const diff = calendarDaysBetween(t.alternate_anchor_date, day)
+      return diff >= 0 && diff % 2 === 0
+    default:
+      return false
+  }
+}
+
 /** Seeds logs for `day`. Skips if `day` is after `calendarToday` (future days). */
 export async function seedTodayLogs(
   userId: string,
-  day: string, // ISO date string: "YYYY-MM-DD"
+  day: string,
   calendarToday?: string,
 ): Promise<void> {
   const cap = calendarToday ?? day
@@ -24,35 +47,40 @@ export async function seedTodayLogs(
 
   const supabase = createClient()
 
-  // Auto-deactivate one-off templates whose date has passed
-  await supabase
+  const { error: deactivateErr } = await supabase
     .from('task_templates')
     .update({ is_active: false })
     .eq('user_id', userId)
     .eq('recurrence', 'once')
     .lt('occurrence_date', cap)
 
+  if (deactivateErr) throw new Error(deactivateErr.message)
+
   const { data: templates, error: tErr } = await supabase
     .from('task_templates')
-    .select('id, recurrence, occurrence_date')
+    .select(
+      'id, recurrence, occurrence_date, recurrence_weekday, alternate_anchor_date',
+    )
     .eq('user_id', userId)
     .eq('is_active', true)
 
-  if (tErr) throw new Error(tErr.message)
+  if (tErr) {
+    const msg = tErr.message ?? String(tErr)
+    if (
+      (msg.includes('recurrence_weekday') ||
+        msg.includes('alternate_anchor_date')) &&
+      (msg.includes('does not exist') || msg.includes('Could not find'))
+    ) {
+      throw new Error(
+        '資料庫尚未套用 migration 006（task_recurrence_extended）。請在 Supabase SQL Editor 執行 supabase/migrations/006_task_recurrence_extended.sql。',
+      )
+    }
+    throw new Error(msg)
+  }
   if (!templates || templates.length === 0) return
 
-  const rows = templates as {
-    id: string
-    recurrence: string | null
-    occurrence_date: string | null
-  }[]
-
-  const eligible = rows.filter((t) => {
-    const r = t.recurrence ?? 'daily'
-    if (r === 'daily') return true
-    if (r === 'once' && t.occurrence_date === day) return true
-    return false
-  })
+  const rows = templates as TemplateSeedRow[]
+  const eligible = rows.filter((t) => isEligibleForDay(t, day))
 
   if (eligible.length === 0) return
 
@@ -76,11 +104,6 @@ export async function seedTodayLogs(
   if (uErr) throw new Error(uErr.message)
 }
 
-// ---------------------------------------------------------------------------
-// fetchTodayLogs
-// Returns all daily_logs for today joined with their task_template.
-// Ordered by sort_order of the template.
-// ---------------------------------------------------------------------------
 export async function fetchTodayLogs(
   userId: string,
   today: string,
@@ -98,11 +121,17 @@ export async function fetchTodayLogs(
   return (data ?? []) as LogWithTemplate[]
 }
 
-// ---------------------------------------------------------------------------
-// updateLogStatus
-// Toggles a task's status and updates completed_at accordingly.
-// Triggers a full page revalidation so the server state stays in sync.
-// ---------------------------------------------------------------------------
+/** Completion counts for a single day (for 紀錄 / weekly). */
+export async function getDayCompletionStats(
+  userId: string,
+  day: string,
+): Promise<{ completed: number; total: number }> {
+  const logs = await fetchTodayLogs(userId, day)
+  const total = logs.length
+  const completed = logs.filter((l) => l.status === 'completed').length
+  return { completed, total }
+}
+
 export async function updateLogStatus(
   logId: string,
   status: TaskStatus,
@@ -119,16 +148,37 @@ export async function updateLogStatus(
 
   if (error) throw new Error(error.message)
 
+  if (status === 'completed') {
+    const { data: logRow, error: fetchErr } = await supabase
+      .from('daily_logs')
+      .select('task_template_id')
+      .eq('id', logId)
+      .maybeSingle()
+
+    if (!fetchErr && logRow?.task_template_id) {
+      const { data: tpl } = await supabase
+        .from('task_templates')
+        .select('recurrence')
+        .eq('id', logRow.task_template_id)
+        .maybeSingle()
+
+      const rec = (tpl as { recurrence?: string } | null)?.recurrence
+      if (rec === 'once') {
+        await supabase
+          .from('task_templates')
+          .update({ is_active: false })
+          .eq('id', logRow.task_template_id)
+      }
+    }
+  }
+
   revalidatePath('/')
   revalidatePath('/today')
   revalidatePath('/weekly')
+  revalidatePath('/weekly/record')
+  revalidatePath('/focus')
 }
 
-// ---------------------------------------------------------------------------
-// updateLogNote
-// Persists the note text for a task. Called on textarea blur.
-// No page revalidation needed — optimistic UI already reflects the change.
-// ---------------------------------------------------------------------------
 export async function updateLogNote(
   logId: string,
   note: string,
@@ -144,11 +194,9 @@ export async function updateLogNote(
 
   revalidatePath('/today')
   revalidatePath('/weekly')
+  revalidatePath('/weekly/record')
 }
 
-// ---------------------------------------------------------------------------
-// fetchLogsBetweenDates — for weekly journal (read-only history)
-// ---------------------------------------------------------------------------
 export async function fetchLogsBetweenDates(
   userId: string,
   startDate: string,

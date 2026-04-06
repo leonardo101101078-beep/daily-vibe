@@ -12,6 +12,27 @@ type Props = {
   templates: TaskTemplate[]
 }
 
+const WEEKDAY_LABELS = ['週一', '週二', '週三', '週四', '週五', '週六', '週日']
+
+function recurrenceSubtitle(t: TaskTemplate): string {
+  switch (t.recurrence) {
+    case 'once':
+      return t.occurrence_date ? `單次 ${t.occurrence_date}` : '單次'
+    case 'daily':
+      return '每日'
+    case 'weekly':
+      return t.recurrence_weekday != null
+        ? `每週 ${WEEKDAY_LABELS[t.recurrence_weekday]}`
+        : '每週'
+    case 'every_other_day':
+      return t.alternate_anchor_date
+        ? `隔日（起 ${t.alternate_anchor_date}）`
+        : '隔日'
+    default:
+      return '循環'
+  }
+}
+
 export function ManageTaskTemplates({ templates }: Props) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -40,10 +61,7 @@ export function ManageTaskTemplates({ templates }: Props) {
               <div className="min-w-0">
                 <p className="text-sm font-medium leading-snug">{t.title}</p>
                 <p className="text-[11px] text-muted-foreground">
-                  {labelForCategory(t.category)}
-                  {t.recurrence === 'once' && t.occurrence_date
-                    ? ` · 單次 ${t.occurrence_date}`
-                    : ' · 循環'}
+                  {labelForCategory(t.category)} · {recurrenceSubtitle(t)}
                 </p>
               </div>
               <Button
