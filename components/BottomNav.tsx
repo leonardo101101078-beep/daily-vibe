@@ -2,13 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CalendarCheck, CalendarDays, ListPlus } from 'lucide-react'
+import { CalendarCheck, CalendarDays, ListPlus, UserRound } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const links = [
   { href: '/', label: '本日', icon: CalendarCheck },
   { href: '/weekly', label: '每周', icon: CalendarDays },
   { href: '/templates', label: '新增', icon: ListPlus },
+  { href: '/settings', label: '帳號', icon: UserRound },
 ] as const
 
 export function BottomNav() {
