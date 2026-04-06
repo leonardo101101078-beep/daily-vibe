@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: '追蹤每日重複事項、進度與每晚回顧',
     start_url: '/',
     display: 'standalone',
-    background_color: '#ffffff',
-    theme_color: '#6366f1',
+    background_color: '#fff7f2',
+    theme_color: '#2d916f',
     orientation: 'portrait',
     icons: [
       {

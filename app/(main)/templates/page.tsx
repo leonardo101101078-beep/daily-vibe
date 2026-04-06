@@ -77,18 +77,20 @@ export default async function TemplatesPage() {
         <div className="mb-6 flex items-center gap-3">
           <Link
             href="/"
-            className="rounded-lg border p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="rounded-xl border border-border/60 bg-card p-2.5 text-muted-foreground shadow-sm transition-all duration-200 hover:bg-muted hover:text-foreground active:scale-95"
             aria-label="返回本日任務"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div className="flex min-w-0 flex-1 items-center gap-2">
-            <ListChecks className="h-5 w-5 text-primary" />
-            <h1 className="text-xl font-bold tracking-tight">新增任務</h1>
+            <ListChecks className="h-6 w-6 shrink-0 text-primary" />
+            <h1 className="font-display text-2xl font-extrabold tracking-tight">
+              新增任務
+            </h1>
           </div>
         </div>
 
-        <p className="mb-6 text-sm text-muted-foreground">
+        <p className="mb-6 text-sm leading-relaxed text-muted-foreground">
           建立循環任務後每天會自動出現；單一任務只在指定日期出現一次。
         </p>
 

@@ -25,7 +25,7 @@ export function TodayClock() {
   }, [])
 
   return (
-    <p className="text-2xl font-semibold tabular-nums tracking-tight text-foreground">
+    <p className="font-display text-3xl font-bold tabular-nums tracking-tight text-foreground">
       {time}
     </p>
   )

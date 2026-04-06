@@ -53,16 +53,18 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-6">
-      <div className="w-full max-w-xs space-y-7">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-bento-peach/90 via-background to-bento-sky/40 px-6">
+      <div className="w-full max-w-xs space-y-7 rounded-3xl border border-border/50 bg-card/90 p-6 shadow-xl shadow-primary/5 backdrop-blur-sm">
         <div className="space-y-3 text-center">
           <div className="flex justify-center">
-            <div className="rounded-2xl bg-primary/10 p-5">
+            <div className="rounded-2xl bg-primary/12 p-5 transition-transform duration-200 hover:scale-105">
               <CalendarDays className="h-10 w-10 text-primary" />
             </div>
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">DailyVibe</h1>
+            <h1 className="font-display text-2xl font-extrabold tracking-tight">
+              DailyVibe
+            </h1>
             <p className="mt-1 text-sm text-muted-foreground">
               使用信箱與密碼登入
             </p>
@@ -79,7 +81,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
-              className="w-full rounded-xl border border-input bg-background py-3 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full rounded-xl border border-input bg-background py-3 pl-10 pr-4 text-sm transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
           <div className="relative">
@@ -91,7 +93,7 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               autoComplete="current-password"
-              className="w-full rounded-xl border border-input bg-background py-3 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full rounded-xl border border-input bg-background py-3 pl-10 pr-4 text-sm transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
 
@@ -100,7 +102,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading || !email || !password}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-medium text-primary-foreground transition-opacity disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-md transition-all duration-200 hover:brightness-105 active:scale-[0.98] disabled:opacity-60"
           >
             {loading ? (
               <Loader2 className="h-4 w-4 animate-spin" />

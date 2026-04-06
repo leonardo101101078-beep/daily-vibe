@@ -48,6 +48,11 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        bento: {
+          peach: 'hsl(var(--bento-peach) / <alpha-value>)',
+          mint: 'hsl(var(--bento-mint) / <alpha-value>)',
+          sky: 'hsl(var(--bento-sky) / <alpha-value>)',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -56,6 +61,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
+        display: ['var(--font-display)', 'var(--font-sans)', ...fontFamily.sans],
       },
       keyframes: {
         'accordion-down': {

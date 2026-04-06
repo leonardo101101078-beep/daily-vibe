@@ -46,26 +46,76 @@ export default async function HomePage() {
     getWellnessForDate(user.id, today),
   ])
 
+  const taskCount = logs.length
+
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-md">
-        <header className="px-5 pb-4 pt-10">
+        <header className="px-5 pb-6 pt-10">
           <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
             {formatDisplayDate(today)}
           </p>
-          <TodayClock />
-          <h1 className="mt-2 text-xl font-bold tracking-tight">
-            {getGreeting()}，今天繼續加油
+          <h1 className="font-display mt-3 text-[1.75rem] font-extrabold leading-tight tracking-tight text-foreground sm:text-4xl">
+            今日待辦
+            <span className="text-muted-foreground">（{taskCount}）</span>
           </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {getGreeting()}，今天繼續加油
+          </p>
         </header>
 
-        <div className="space-y-5 px-5 pb-4">
+        <div className="grid grid-cols-2 gap-3 px-5 pb-4">
+          <div
+            className="motion-bento-in flex flex-col justify-between rounded-2xl border border-border/50 bg-bento-mint/90 p-4 shadow-sm [animation-delay:0ms]"
+            style={{ animationDelay: '0ms' }}
+          >
+            <TodayClock />
+            <span className="mt-2 text-[11px] font-medium text-muted-foreground">
+              本地時間
+            </span>
+          </div>
+          <div
+            className="motion-bento-in flex flex-col justify-center rounded-2xl border border-border/50 bg-bento-sky/90 p-4 shadow-sm"
+            style={{ animationDelay: '70ms' }}
+          >
+            <p className="font-display text-2xl font-bold tabular-nums leading-none text-foreground">
+              {taskCount > 0
+                ? Math.round(
+                    (logs.filter((l) => l.status === 'completed').length /
+                      taskCount) *
+                      100,
+                  )
+                : 0}
+              <span className="text-lg font-semibold text-muted-foreground">
+                %
+              </span>
+            </p>
+            <span className="mt-2 text-[11px] font-medium text-muted-foreground">
+              今日完成度
+            </span>
+          </div>
+        </div>
+
+        <div
+          className="motion-bento-in px-5 pb-4"
+          style={{ animationDelay: '140ms' }}
+        >
           <WellnessCard date={today} initial={wellness} />
         </div>
 
-        <GroupedDayChecklist initialLogs={logs} />
+        <div
+          className="motion-bento-in px-5"
+          style={{ animationDelay: '210ms' }}
+        >
+          <div className="overflow-hidden rounded-2xl border border-border/50 bg-card/90 shadow-sm backdrop-blur-sm">
+            <GroupedDayChecklist initialLogs={logs} />
+          </div>
+        </div>
 
-        <div className="px-5 pb-8 pt-4">
+        <div
+          className="motion-bento-in px-5 pb-8 pt-5"
+          style={{ animationDelay: '280ms' }}
+        >
           <NotificationToggle initialSettings={notificationSettings} />
         </div>
       </div>

@@ -71,7 +71,7 @@ export function GroupedDayChecklist({ initialLogs }: GroupedDayChecklistProps) {
 
   if (logs.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center px-5 py-12 text-center">
+      <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
         <div className="rounded-2xl bg-muted p-5">
           <ClipboardList className="h-8 w-8 text-muted-foreground" />
         </div>
@@ -91,12 +91,12 @@ export function GroupedDayChecklist({ initialLogs }: GroupedDayChecklistProps) {
 
   return (
     <div className="space-y-6 pb-4">
-      <div className="px-5 pt-2">
+      <div className="px-4 pt-2">
         <DailyProgress completed={completed} total={logs.length} />
       </div>
 
       {reminders.length > 0 && (
-        <section className="px-5">
+        <section className="px-4">
           <h2 className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             提醒事項
           </h2>
@@ -115,7 +115,7 @@ export function GroupedDayChecklist({ initialLogs }: GroupedDayChecklistProps) {
       )}
 
       {mainByCat.map(({ key, label, items }) => (
-        <section key={key} className="px-5">
+        <section key={key} className="px-4">
           <h2 className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {label}
           </h2>
@@ -134,7 +134,7 @@ export function GroupedDayChecklist({ initialLogs }: GroupedDayChecklistProps) {
       ))}
 
       {others.length > 0 && (
-        <section className="px-5">
+        <section className="px-4">
           <h2 className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             其他
           </h2>

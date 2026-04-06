@@ -16,8 +16,8 @@ export function BottomNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-20 border-t bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="mx-auto flex max-w-md items-stretch justify-around">
+    <nav className="fixed bottom-0 left-0 right-0 z-20 mx-auto max-w-md rounded-t-3xl border border-border/60 bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_-12px_rgba(0,0,0,0.12)] backdrop-blur-md supports-[backdrop-filter]:bg-card/90">
+      <div className="flex items-stretch justify-around px-1 pt-1">
         {links.map(({ href, label, icon: Icon }) => {
           const active =
             href === '/'
@@ -28,13 +28,13 @@ export function BottomNav() {
               key={href}
               href={href}
               className={cn(
-                'flex min-h-[3.25rem] flex-1 flex-col items-center justify-center gap-0.5 py-1.5 text-[10px] font-medium transition-colors',
+                'flex min-h-[3.25rem] flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl py-2 text-[10px] font-semibold transition-all duration-200 active:scale-95 motion-reduce:active:scale-100',
                 active
-                  ? 'text-primary'
-                  : 'text-muted-foreground hover:text-foreground',
+                  ? 'bg-primary/12 text-primary'
+                  : 'text-muted-foreground hover:bg-muted/80 hover:text-foreground',
               )}
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="h-5 w-5 transition-transform duration-200" />
               {label}
             </Link>
           )

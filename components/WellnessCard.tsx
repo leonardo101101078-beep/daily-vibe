@@ -59,7 +59,7 @@ export function WellnessCard({ date, initial }: WellnessCardProps) {
   }
 
   return (
-    <section className="rounded-xl border bg-card px-4 py-4 shadow-sm">
+    <section className="rounded-2xl border border-border/50 bg-bento-peach/80 px-4 py-4 shadow-sm transition-shadow duration-200 hover:shadow-md">
       <div className="mb-3 flex items-center gap-2">
         <Activity className="h-4 w-4 text-primary" />
         <h2 className="text-sm font-semibold">健康管理</h2>

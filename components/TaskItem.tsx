@@ -36,7 +36,7 @@ export function TaskItem({ log, onToggle, onNoteChange }: TaskItemProps) {
   return (
     <Card
       className={cn(
-        'transition-all duration-200',
+        'duration-200 motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100',
         isCompleted && 'opacity-55',
       )}
     >
