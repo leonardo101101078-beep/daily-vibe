@@ -2,10 +2,15 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { getSessionUser } from '@/lib/auth/session'
 import type { TaskRecurrence, TaskTemplate } from '@/types/database'
 import { isPresetCategory } from '@/lib/task-categories'
 
 const REVALIDATE = ['/', '/today', '/templates', '/weekly', '/focus'] as const
+
+/** 與 TaskTemplate 一致之欄位，避免 select * 難以追蹤。 */
+const TASK_TEMPLATE_SELECT =
+  'id, user_id, title, description, category, icon, color, sort_order, is_active, target_value, unit, recurrence, occurrence_date, recurrence_weekday, alternate_anchor_date, created_at, updated_at'
 
 export interface CreateTaskTemplateInput {
   title: string
@@ -20,15 +25,13 @@ export interface CreateTaskTemplateInput {
 }
 
 export async function getTaskTemplates(): Promise<TaskTemplate[]> {
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getSessionUser()
   if (!user) return []
 
+  const supabase = createClient()
   const { data, error } = await supabase
     .from('task_templates')
-    .select('*')
+    .select(TASK_TEMPLATE_SELECT)
     .eq('user_id', user.id)
     .order('sort_order', { ascending: true })
 
@@ -62,11 +65,10 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
 export async function createTaskTemplate(
   input: CreateTaskTemplateInput,
 ): Promise<void> {
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getSessionUser()
   if (!user) throw new Error('Not authenticated')
+
+  const supabase = createClient()
 
   const title = input.title?.trim()
   if (!title) throw new Error('標題為必填')
@@ -141,11 +143,10 @@ export async function createTaskTemplate(
 }
 
 export async function deactivateTaskTemplate(templateId: string): Promise<void> {
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getSessionUser()
   if (!user) throw new Error('Not authenticated')
+
+  const supabase = createClient()
 
   const { error } = await supabase
     .from('task_templates')

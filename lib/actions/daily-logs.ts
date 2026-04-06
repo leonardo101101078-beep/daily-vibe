@@ -8,13 +8,12 @@ import type {
   LogWithTemplate,
   DailyLogInsert,
 } from '@/types/database'
+import type { TemplateSeedRow } from '@/lib/task-seed-rows'
 
-type TemplateSeedRow = {
-  id: string
-  recurrence: string | null
-  occurrence_date: string | null
-  recurrence_weekday: number | null
-  alternate_anchor_date: string | null
+export type { TemplateSeedRow } from '@/lib/task-seed-rows'
+
+export type SeedTodayLogsOptions = {
+  preloadedActiveTemplates?: TemplateSeedRow[]
 }
 
 function isEligibleForDay(t: TemplateSeedRow, day: string): boolean {
@@ -41,6 +40,7 @@ export async function seedTodayLogs(
   userId: string,
   day: string,
   calendarToday?: string,
+  options?: SeedTodayLogsOptions,
 ): Promise<void> {
   const cap = calendarToday ?? day
   if (day > cap) return
@@ -56,30 +56,37 @@ export async function seedTodayLogs(
 
   if (deactivateErr) throw new Error(deactivateErr.message)
 
-  const { data: templates, error: tErr } = await supabase
-    .from('task_templates')
-    .select(
-      'id, recurrence, occurrence_date, recurrence_weekday, alternate_anchor_date',
-    )
-    .eq('user_id', userId)
-    .eq('is_active', true)
+  let rows: TemplateSeedRow[]
 
-  if (tErr) {
-    const msg = tErr.message ?? String(tErr)
-    if (
-      (msg.includes('recurrence_weekday') ||
-        msg.includes('alternate_anchor_date')) &&
-      (msg.includes('does not exist') || msg.includes('Could not find'))
-    ) {
-      throw new Error(
-        '資料庫尚未套用 migration 006（task_recurrence_extended）。請在 Supabase SQL Editor 執行 supabase/migrations/006_task_recurrence_extended.sql。',
+  if (options?.preloadedActiveTemplates) {
+    rows = options.preloadedActiveTemplates
+  } else {
+    const { data: templates, error: tErr } = await supabase
+      .from('task_templates')
+      .select(
+        'id, recurrence, occurrence_date, recurrence_weekday, alternate_anchor_date',
       )
-    }
-    throw new Error(msg)
-  }
-  if (!templates || templates.length === 0) return
+      .eq('user_id', userId)
+      .eq('is_active', true)
 
-  const rows = templates as TemplateSeedRow[]
+    if (tErr) {
+      const msg = tErr.message ?? String(tErr)
+      if (
+        (msg.includes('recurrence_weekday') ||
+          msg.includes('alternate_anchor_date')) &&
+        (msg.includes('does not exist') || msg.includes('Could not find'))
+      ) {
+        throw new Error(
+          '資料庫尚未套用 migration 006（task_recurrence_extended）。請在 Supabase SQL Editor 執行 supabase/migrations/006_task_recurrence_extended.sql。',
+        )
+      }
+      throw new Error(msg)
+    }
+    if (!templates || templates.length === 0) return
+    rows = templates as TemplateSeedRow[]
+  }
+
+  if (rows.length === 0) return
   const eligible = rows.filter((t) => isEligibleForDay(t, day))
 
   if (eligible.length === 0) return

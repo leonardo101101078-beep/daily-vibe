@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionUser } from '@/lib/auth/session'
 import { listAnnualGoals, listMonthlyGoals } from '@/lib/actions/goals'
 import { FocusGoalsClient } from '@/components/focus/FocusGoalsClient'
 
@@ -12,10 +12,7 @@ export default async function FocusPage({
 }: {
   searchParams: { year?: string; month?: string }
 }) {
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getSessionUser()
   if (!user) redirect('/login')
 
   const now = new Date()

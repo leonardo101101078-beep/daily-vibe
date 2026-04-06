@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionUser } from '@/lib/auth/session'
 import { listWeeklyGoals } from '@/lib/actions/goals'
 import { mondayOfWeekContaining, weekDayLabels } from '@/lib/week'
 import {
@@ -39,10 +39,7 @@ export default async function WeeklyPage({
 }: {
   searchParams: { week?: string; month?: string }
 }) {
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getSessionUser()
   if (!user) redirect('/login')
 
   const calendarToday = getLocalDateString()

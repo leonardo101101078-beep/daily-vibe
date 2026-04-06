@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { getSessionUser } from '@/lib/auth/session'
 
 export interface WellnessFormState {
   weight: number | null
@@ -43,11 +44,10 @@ export async function upsertWellness(
   date: string,
   payload: WellnessFormState,
 ): Promise<void> {
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getSessionUser()
   if (!user) throw new Error('Not authenticated')
+
+  const supabase = createClient()
 
   const { error } = await supabase.from('daily_wellness').upsert(
     {

@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getSessionUser } from '@/lib/auth/session'
 import { SettingsClient } from '@/components/settings/SettingsClient'
 
 export const metadata = {
@@ -7,12 +8,10 @@ export const metadata = {
 }
 
 export default async function SettingsPage() {
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
+  const user = await getSessionUser()
   if (!user) redirect('/login')
+
+  const supabase = createClient()
 
   const { data: profile } = await supabase
     .from('profiles')

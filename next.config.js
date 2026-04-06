@@ -18,17 +18,9 @@ const withPWA = require('@ducanh2912/next-pwa').default({
       handler: 'NetworkOnly',
     },
     {
-      // Cache Supabase REST API calls with NetworkFirst strategy
+      // 即時資料為主：避免 NetworkFirst 在慢網路時長時間等待 networkTimeout
       urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/.*/i,
-      handler: 'NetworkFirst',
-      options: {
-        cacheName: 'supabase-api-cache',
-        expiration: {
-          maxEntries: 64,
-          maxAgeSeconds: 24 * 60 * 60, // 24 hours
-        },
-        networkTimeoutSeconds: 10,
-      },
+      handler: 'NetworkOnly',
     },
   ],
 })

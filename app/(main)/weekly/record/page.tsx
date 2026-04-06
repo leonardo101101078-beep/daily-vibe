@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionUser } from '@/lib/auth/session'
 import { getDayCompletionStats } from '@/lib/actions/daily-logs'
 import { WeeklyRecordClient } from '@/components/weekly/WeeklyRecordClient'
 
@@ -17,10 +17,7 @@ export default async function WeeklyRecordPage({
 }: {
   searchParams: { date?: string }
 }) {
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getSessionUser()
   if (!user) redirect('/login')
 
   const cap = todayLocal()

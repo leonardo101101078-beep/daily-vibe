@@ -1,14 +1,40 @@
+import { Suspense } from 'react'
+import nextDynamic from 'next/dynamic'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getSessionUser } from '@/lib/auth/session'
+import { toSeedRowsFromTemplates } from '@/lib/task-seed-rows'
 import { seedTodayLogs, fetchTodayLogs } from '@/lib/actions/daily-logs'
 import { getWellnessForDate } from '@/lib/actions/wellness'
 import { getTaskTemplates } from '@/lib/actions/task-templates'
 import { GroupedDayChecklist } from '@/components/GroupedDayChecklist'
 import { TodayClock } from '@/components/TodayClock'
 import { WellnessCard } from '@/components/WellnessCard'
-import { TemplateForm } from '@/components/TemplateForm'
 import { DailyNoteCard } from '@/components/DailyNoteCard'
-import { ManageTaskTemplates } from '@/components/ManageTaskTemplates'
+
+const TemplateForm = nextDynamic(
+  () =>
+    import('@/components/TemplateForm').then((m) => ({
+      default: m.TemplateForm,
+    })),
+  {
+    loading: () => (
+      <div className="h-28 animate-pulse rounded-2xl border border-border/50 bg-muted/40" />
+    ),
+  },
+)
+
+const ManageTaskTemplates = nextDynamic(
+  () =>
+    import('@/components/ManageTaskTemplates').then((m) => ({
+      default: m.ManageTaskTemplates,
+    })),
+  {
+    loading: () => (
+      <div className="h-24 animate-pulse rounded-xl border border-border/50 bg-muted/40" />
+    ),
+  },
+)
 
 function getLocalDateString(): string {
   const now = new Date()
@@ -45,22 +71,41 @@ export const metadata = {
 /** 避免快取導致新增任務／seed 後仍顯示舊清單 */
 export const dynamic = 'force-dynamic'
 
-export default async function TodayPage({
+function TodayLoading() {
+  return (
+    <main className="min-h-screen bg-background">
+      <div className="mx-auto max-w-md px-5 py-16 text-center text-sm text-muted-foreground">
+        載入中…
+      </div>
+    </main>
+  )
+}
+
+export default function TodayPage({
   searchParams,
 }: {
   searchParams: { date?: string }
 }) {
-  const supabase = createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  return (
+    <Suspense fallback={<TodayLoading />}>
+      <TodayContent searchParams={searchParams} />
+    </Suspense>
+  )
+}
 
+async function TodayContent({
+  searchParams,
+}: {
+  searchParams: { date?: string }
+}) {
+  const user = await getSessionUser()
   if (!user) redirect('/login')
 
+  const supabase = createClient()
   const calendarToday = getLocalDateString()
   const viewDate = parseViewDate(searchParams.date, calendarToday)
 
-  const [{ data: review }, wellness] = await Promise.all([
+  const [{ data: review }, wellness, templates] = await Promise.all([
     supabase
       .from('daily_reviews')
       .select('review_text')
@@ -68,14 +113,13 @@ export default async function TodayPage({
       .eq('date', viewDate)
       .maybeSingle(),
     getWellnessForDate(user.id, viewDate),
+    getTaskTemplates(),
   ])
 
-  const [templates, logs] = await Promise.all([
-    getTaskTemplates(),
-    seedTodayLogs(user.id, viewDate, calendarToday).then(() =>
-      fetchTodayLogs(user.id, viewDate),
-    ),
-  ])
+  await seedTodayLogs(user.id, viewDate, calendarToday, {
+    preloadedActiveTemplates: toSeedRowsFromTemplates(templates),
+  })
+  const logs = await fetchTodayLogs(user.id, viewDate)
 
   const taskCount = logs.length
   const isViewingOtherDay = viewDate !== calendarToday
