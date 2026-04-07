@@ -279,14 +279,14 @@ export async function POST(request: Request) {
 
   const buffer = Buffer.from(await zip.generateAsync({ type: 'arraybuffer' }))
   const stamp = new Date().toISOString().slice(0, 10)
-  const filename = `daily-vibe-export-${stamp}.zip`
+  const filename = `daily-vibe-2.0-export-${stamp}.zip`
 
   const resend = new Resend(resendKey)
   const { error: sendError } = await resend.emails.send({
     from: fromEmail,
     to: user.email,
-    subject: `DailyVibe 資料匯出（${stamp}）`,
-    text: `附件為您勾選的 DailyVibe 資料匯出（CSV 打包為 ZIP）。若未收到附件，請檢查垃圾郵件匣。`,
+    subject: `Daily-Vibe 2.0 資料匯出（${stamp}）`,
+    text: `附件為您勾選的 Daily-Vibe 2.0 資料匯出（CSV 打包為 ZIP）。若未收到附件，請檢查垃圾郵件匣。`,
     attachments: [{ filename, content: buffer }],
   })
 

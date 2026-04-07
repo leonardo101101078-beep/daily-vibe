@@ -121,7 +121,7 @@ export async function POST(request: Request) {
 <!DOCTYPE html>
 <html>
 <body style="font-family: sans-serif; line-height: 1.5;">
-  <h2>DailyVibe 週報摘要</h2>
+  <h2>Daily-Vibe 2.0 週報摘要</h2>
   <p>區間：${escapeHtml(dateFrom)} ～ ${escapeHtml(dateTo)}</p>
   <h3>每日完成度</h3>
   ${linesHtml}
@@ -136,7 +136,7 @@ export async function POST(request: Request) {
   const { error } = await resend.emails.send({
     from: fromEmail,
     to: user.email,
-    subject: `DailyVibe 週報 ${dateFrom} ~ ${dateTo}`,
+    subject: `Daily-Vibe 2.0 週報 ${dateFrom} ~ ${dateTo}`,
     html,
   })
 

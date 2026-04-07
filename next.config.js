@@ -18,7 +18,7 @@ const withPWA = require('@ducanh2912/next-pwa').default({
       handler: 'NetworkOnly',
     },
     {
-      // 即時資料為主：避免 NetworkFirst 在慢網路時長時間等待 networkTimeout
+      // 即時資料為主：避免快取舊 REST 回應；本機資料以 IndexedDB 為準（見 lib/local、lib/sync）。
       urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/.*/i,
       handler: 'NetworkOnly',
     },

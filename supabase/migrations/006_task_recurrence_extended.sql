@@ -1,4 +1,4 @@
--- Extend task_templates: weekly + every_other_day; weekday + anchor columns.
+-- Daily-Vibe 2.0 — Extend task_templates: weekly + every_other_day; weekday + anchor columns.
 
 ALTER TABLE public.task_templates
   DROP CONSTRAINT IF EXISTS task_templates_recurrence_check;

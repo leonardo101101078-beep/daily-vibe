@@ -8,15 +8,20 @@ import { upsertDailyNote } from '@/lib/actions/daily-note'
 type Props = {
   date: string
   initialText: string | null
+  persistOverride?: (text: string) => Promise<void>
 }
 
-export function DailyNoteCard({ date, initialText }: Props) {
+export function DailyNoteCard({ date, initialText, persistOverride }: Props) {
   const [value, setValue] = useState(initialText ?? '')
   const [isPending, startTransition] = useTransition()
 
   const save = () => {
     startTransition(async () => {
-      await upsertDailyNote(date, value)
+      if (persistOverride) {
+        await persistOverride(value)
+      } else {
+        await upsertDailyNote(date, value)
+      }
     })
   }
 

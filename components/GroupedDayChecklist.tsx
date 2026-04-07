@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { DailyProgress } from '@/components/DailyProgress'
 import { TaskItem } from '@/components/TaskItem'
 import { updateLogStatus, updateLogNote } from '@/lib/actions/daily-logs'
+import { updateLogNoteLocal, updateLogStatusLocal } from '@/lib/local/log-mutations'
 import {
   MAIN_TASK_CATEGORY_ORDER,
   PRESET_CATEGORY_LABELS,
@@ -17,13 +18,18 @@ import type { LogWithTemplate, TaskStatus } from '@/types/database'
 
 interface GroupedDayChecklistProps {
   initialLogs: LogWithTemplate[]
+  /** When set, writes go to IndexedDB first (Daily-Vibe 2.0 local-first). */
+  localFirst?: boolean
 }
 
 function isMainPreset(cat: string): cat is PresetCategoryKey {
   return (MAIN_TASK_CATEGORY_ORDER as readonly string[]).includes(cat)
 }
 
-export function GroupedDayChecklist({ initialLogs }: GroupedDayChecklistProps) {
+export function GroupedDayChecklist({
+  initialLogs,
+  localFirst = false,
+}: GroupedDayChecklistProps) {
   const [, startTransition] = useTransition()
 
   const [logs, applyOptimistic] = useOptimistic(
@@ -43,14 +49,22 @@ export function GroupedDayChecklist({ initialLogs }: GroupedDayChecklistProps) {
 
     startTransition(async () => {
       applyOptimistic({ id: logId, status: next })
-      await updateLogStatus(logId, next)
+      if (localFirst) {
+        await updateLogStatusLocal(logId, next)
+      } else {
+        await updateLogStatus(logId, next)
+      }
     })
   }
 
   const handleNoteChange = (logId: string, note: string) => {
     startTransition(async () => {
       applyOptimistic({ id: logId, note })
-      await updateLogNote(logId, note)
+      if (localFirst) {
+        await updateLogNoteLocal(logId, note)
+      } else {
+        await updateLogNote(logId, note)
+      }
     })
   }
 

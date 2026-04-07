@@ -31,7 +31,7 @@ function addDays(dateStr: string, days: number): string {
 }
 
 export const metadata = {
-  title: '每週目標 | DailyVibe',
+  title: '每週目標',
 }
 
 export default async function WeeklyPage({

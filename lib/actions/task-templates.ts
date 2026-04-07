@@ -10,7 +10,7 @@ const REVALIDATE = ['/', '/today', '/templates', '/weekly', '/focus'] as const
 
 /** 與 TaskTemplate 一致之欄位，避免 select * 難以追蹤。 */
 const TASK_TEMPLATE_SELECT =
-  'id, user_id, title, description, category, icon, color, sort_order, is_active, target_value, unit, recurrence, occurrence_date, recurrence_weekday, alternate_anchor_date, created_at, updated_at'
+  'id, user_id, title, description, category, icon, color, sort_order, is_active, target_value, unit, recurrence, occurrence_date, recurrence_weekday, alternate_anchor_date, sync_revision, created_at, updated_at'
 
 export interface CreateTaskTemplateInput {
   title: string

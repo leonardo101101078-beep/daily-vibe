@@ -50,7 +50,7 @@ async function browserSubscribe(): Promise<PushSubscription | null> {
   const reg = await getActiveServiceWorkerRegistration()
   if (!reg) {
     console.warn(
-      '[DailyVibe] No active service worker — push needs a production build with PWA enabled.',
+      '[Daily-Vibe 2.0] No active service worker — push needs a production build with PWA enabled.',
     )
     return null
   }

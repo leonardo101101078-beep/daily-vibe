@@ -12,9 +12,15 @@ import { upsertWellness, type WellnessFormState } from '@/lib/actions/wellness'
 interface WellnessCardProps {
   date: string
   initial: WellnessFormState | null
+  /** IndexedDB-first persistence (Daily-Vibe 2.0). When set, server action is skipped. */
+  persistOverride?: (payload: WellnessFormState) => Promise<void>
 }
 
-export function WellnessCard({ date, initial }: WellnessCardProps) {
+export function WellnessCard({
+  date,
+  initial,
+  persistOverride,
+}: WellnessCardProps) {
   const [weight, setWeight] = useState(
     initial?.weight != null ? String(initial.weight) : '',
   )
@@ -50,7 +56,11 @@ export function WellnessCard({ date, initial }: WellnessCardProps) {
 
     startTransition(async () => {
       try {
-        await upsertWellness(date, payload)
+        if (persistOverride) {
+          await persistOverride(payload)
+        } else {
+          await upsertWellness(date, payload)
+        }
         setSaved(true)
         setTimeout(() => setSaved(false), 1500)
       } catch (e) {
@@ -120,12 +130,17 @@ export function WellnessCard({ date, initial }: WellnessCardProps) {
                 weight.trim() === '' ? null : Number(weight)
               startTransition(async () => {
                 try {
-                  await upsertWellness(date, {
+                  const p = {
                     weight: w != null && !Number.isNaN(w) ? w : null,
                     diet_note: dietNote,
                     exercise_done: done,
                     exercise_note: exerciseNote,
-                  })
+                  }
+                  if (persistOverride) {
+                    await persistOverride(p)
+                  } else {
+                    await upsertWellness(date, p)
+                  }
                 } catch {
                   /* optional: toast */
                 }

@@ -1,4 +1,4 @@
--- DailyVibe — daily wellness (weight, diet, exercise) per user per day
+-- Daily-Vibe 2.0 — daily wellness (weight, diet, exercise) per user per day
 CREATE TABLE IF NOT EXISTS public.daily_wellness (
   id              UUID           PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id         UUID           NOT NULL REFERENCES public.profiles (id) ON DELETE CASCADE,

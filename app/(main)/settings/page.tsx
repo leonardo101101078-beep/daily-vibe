@@ -4,7 +4,7 @@ import { getSessionUser } from '@/lib/auth/session'
 import { SettingsClient } from '@/components/settings/SettingsClient'
 
 export const metadata = {
-  title: '個人檔案 | DailyVibe',
+  title: '個人檔案',
 }
 
 export default async function SettingsPage() {

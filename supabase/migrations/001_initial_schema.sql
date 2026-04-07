@@ -1,5 +1,5 @@
 -- =============================================================================
--- DailyVibe — Initial Schema Migration
+-- Daily-Vibe 2.0 — Initial Schema Migration
 -- =============================================================================
 -- Run this in the Supabase SQL Editor or via `supabase db push`.
 -- The script is idempotent: safe to re-run thanks to IF NOT EXISTS guards.

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google'
+import { APP_DISPLAY_NAME } from '@/lib/app-brand'
 import './globals.css'
 
 const inter = Inter({
@@ -17,23 +18,23 @@ const plusJakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: 'DailyVibe',
-    template: '%s | DailyVibe',
+    default: APP_DISPLAY_NAME,
+    template: `%s | ${APP_DISPLAY_NAME}`,
   },
-  description: '追蹤每日重複事項、進度與每晚回顧',
+  description: '追蹤每日重複事項、進度與每晚回顧（離線優先、雲端同步）',
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'DailyVibe',
+    title: APP_DISPLAY_NAME,
   },
   formatDetection: {
     telephone: false,
   },
   openGraph: {
     type: 'website',
-    title: 'DailyVibe',
-    description: '追蹤每日重複事項、進度與每晚回顧',
+    title: APP_DISPLAY_NAME,
+    description: '追蹤每日重複事項、進度與每晚回顧（離線優先、雲端同步）',
   },
 }
 

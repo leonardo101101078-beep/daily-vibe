@@ -1,5 +1,5 @@
 -- =============================================================================
--- Annual / monthly / weekly user goals
+-- Daily-Vibe 2.0 — Annual / monthly / weekly user goals
 -- =============================================================================
 
 CREATE TABLE IF NOT EXISTS public.annual_goals (

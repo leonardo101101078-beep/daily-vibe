@@ -1,10 +1,11 @@
 import type { MetadataRoute } from 'next'
+import { APP_DISPLAY_NAME, APP_SHORT_NAME } from '@/lib/app-brand'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'DailyVibe',
-    short_name: 'DailyVibe',
-    description: '追蹤每日重複事項、進度與每晚回顧',
+    name: APP_DISPLAY_NAME,
+    short_name: APP_SHORT_NAME,
+    description: '追蹤每日重複事項、進度與每晚回顧（離線優先、雲端同步）',
     start_url: '/',
     display: 'standalone',
     background_color: '#fff7f2',

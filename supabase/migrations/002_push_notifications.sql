@@ -1,5 +1,5 @@
 -- =============================================================================
--- DailyVibe — Push Notifications Migration
+-- Daily-Vibe 2.0 — Push Notifications Migration
 -- =============================================================================
 -- Adds:
 --   1. public.subscriptions       — stores Web Push endpoint + encryption keys

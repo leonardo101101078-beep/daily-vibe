@@ -4,7 +4,7 @@ import { listAnnualGoals, listMonthlyGoals } from '@/lib/actions/goals'
 import { FocusGoalsClient } from '@/components/focus/FocusGoalsClient'
 
 export const metadata = {
-  title: '重點任務 | DailyVibe',
+  title: '重點任務',
 }
 
 export default async function FocusPage({

@@ -1,5 +1,5 @@
 // =============================================================================
-// DailyVibe — Push Cron Endpoint
+// Daily-Vibe 2.0 — Push Cron Endpoint
 // POST /api/push/cron
 // =============================================================================
 // Called by an external scheduler (Vercel Cron, cron-job.org, etc.) every
@@ -40,17 +40,24 @@ function isTimeMatch(target: string, current: string): boolean {
 // ---------------------------------------------------------------------------
 // Notification copy for each slot
 // ---------------------------------------------------------------------------
-function buildPayload(slot: 'morning' | 'evening') {
+function buildPayload(slot: 'morning' | 'evening' | 'sync') {
   if (slot === 'morning') {
     return {
       title: '早安！今日任務來了 ☀️',
-      body: '打開 DailyVibe，確認今天的待辦清單。',
+      body: '打開 Daily-Vibe 2.0，確認今天的待辦清單。',
+      url: '/today',
+    }
+  }
+  if (slot === 'evening') {
+    return {
+      title: '今天過得如何？🌙',
+      body: '花幾分鐘回顧今日進度，規劃明天的計畫。',
       url: '/today',
     }
   }
   return {
-    title: '今天過得如何？🌙',
-    body: '花幾分鐘回顧今日進度，規劃明天的計畫。',
+    title: '該同步到雲端了 ☁️',
+    body: '開啟 Daily-Vibe 2.0，將本機與雲端資料合併。',
     url: '/today',
   }
 }
@@ -93,11 +100,20 @@ export async function POST(req: NextRequest) {
 
   for (const s of settings) {
     const localTime = toLocalHHMM(now, s.timezone)
-    const slot: 'morning' | 'evening' | null = isTimeMatch(s.morning_time, localTime)
+    const nightlyEnabled = s.nightly_sync_enabled ?? true
+    const nightlyTime = s.nightly_sync_time ?? '23:00'
+    const nightlySync = nightlyEnabled && isTimeMatch(nightlyTime, localTime)
+
+    const slot: 'morning' | 'evening' | 'sync' | null = isTimeMatch(
+      s.morning_time,
+      localTime,
+    )
       ? 'morning'
       : isTimeMatch(s.evening_time, localTime)
         ? 'evening'
-        : null
+        : nightlySync
+          ? 'sync'
+          : null
 
     if (!slot) continue
 

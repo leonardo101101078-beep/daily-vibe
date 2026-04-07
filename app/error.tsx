@@ -10,7 +10,7 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error('[DailyVibe]', error)
+    console.error('[Daily-Vibe 2.0]', error)
   }, [error])
 
   return (

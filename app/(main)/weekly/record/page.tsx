@@ -9,7 +9,7 @@ function todayLocal(): string {
 }
 
 export const metadata = {
-  title: '紀錄 | DailyVibe',
+  title: '紀錄',
 }
 
 export default async function WeeklyRecordPage({

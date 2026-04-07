@@ -23,7 +23,9 @@ export default function GlobalError({
             color: '#171717',
           }}
         >
-          <h1 style={{ fontSize: '1.125rem', fontWeight: 600 }}>DailyVibe 無法載入</h1>
+          <h1 style={{ fontSize: '1.125rem', fontWeight: 600 }}>
+            Daily-Vibe 2.0 無法載入
+          </h1>
           <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#525252', maxWidth: '20rem' }}>
             根版面發生嚴重錯誤。請重新整理頁面；若持續發生，請清除本站 Service Worker
             與快取後再試。

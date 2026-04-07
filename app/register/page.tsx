@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { CalendarDays, Loader2, Lock, Mail } from 'lucide-react'
 import { AppIcon } from '@/components/AppIcon'
 import { createClient } from '@/lib/supabase/client'
+import { APP_DISPLAY_NAME } from '@/lib/app-brand'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -89,7 +90,7 @@ export default function RegisterPage() {
               註冊
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              建立 DailyVibe 帳號
+              建立 {APP_DISPLAY_NAME} 帳號
             </p>
           </div>
         </div>

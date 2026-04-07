@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { CalendarDays, Loader2, Lock, Mail } from 'lucide-react'
 import { AppIcon } from '@/components/AppIcon'
 import { createClient } from '@/lib/supabase/client'
+import { APP_DISPLAY_NAME } from '@/lib/app-brand'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -68,7 +69,7 @@ export default function LoginPage() {
           </div>
           <div>
             <h1 className="font-display text-2xl font-extrabold tracking-tight">
-              DailyVibe
+              {APP_DISPLAY_NAME}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
               使用信箱與密碼登入

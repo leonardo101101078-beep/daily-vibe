@@ -1,5 +1,5 @@
 // =============================================================================
-// DailyVibe — Custom Service Worker Extension
+// Daily-Vibe 2.0 — Custom Service Worker Extension
 // =============================================================================
 // This file is compiled and merged into the Workbox-generated SW by
 // @ducanh2912/next-pwa via the `customWorkerSrc: 'worker/index.ts'` option.

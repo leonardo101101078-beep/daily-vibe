@@ -1,4 +1,4 @@
--- DailyVibe — recurrence: daily (every day) vs once (single occurrence_date)
+-- Daily-Vibe 2.0 — recurrence: daily (every day) vs once (single occurrence_date)
 ALTER TABLE public.task_templates
   ADD COLUMN IF NOT EXISTS recurrence TEXT NOT NULL DEFAULT 'daily';
 

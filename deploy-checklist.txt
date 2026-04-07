@@ -1,4 +1,4 @@
-DailyVibe — Vercel 上線後請手動勾選（本檔不提交機密）
+Daily-Vibe 2.0 — Vercel 上線後請手動勾選（本檔不提交機密）
 
 [ ] 1. Vercel：Import Git 倉庫；若倉庫根目錄含多個專案，Root Directory 設為 daily-vibe；Node.js 20.x
 [ ] 2. Vercel：Settings → Environment Variables，依 .env.local.example 填入 Production（勿把 .env.local 提交 Git）
